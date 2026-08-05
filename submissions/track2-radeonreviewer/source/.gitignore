@@ -1,0 +1,23 @@
+# .gitignore for RadeonReviewer
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# env / secrets
+.env
+*.pem
+*.key
+
+# runtime
+logs/
+*.log
+reviews.sqlite
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
