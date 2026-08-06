@@ -15,7 +15,7 @@
 | Material | File / Link |
 |---|---|
 | 🎬 **3-5 min Demo Video** | [Hello_E_World_FINAL_v3.mp4](presentation/Hello_E_World_FINAL_v3.mp4) |
-| 📊 **Pitch Deck (PPTX)** | [Hello_E_World_v5.pptx](presentation/Hello_E_World_v5.pptx) |
+| 📊 **Pitch Deck (PPTX)** | [Hello_E_World_Pitch_Deck.pptx](presentation/Hello_E_World_Pitch_Deck.pptx) |
 | 🔬 **GPU Inference Report** | [RADEON_INFERENCE_OPTIMIZATION_REPORT.md](presentation/RADEON_INFERENCE_OPTIMIZATION_REPORT.md) |
 | 📋 **Performance Results** | [PERFORMANCE_RESULTS.md](PERFORMANCE_RESULTS.md) |
 | 🔧 **Model API Spec** | [MODEL_API.md](MODEL_API.md) |
@@ -153,7 +153,7 @@ Render Scene + Action Buttons
 submission/
 ├── presentation/
 │   ├── Hello_E_World_FINAL_v3.mp4          # 3-5 min demo video
-│   ├── Hello_E_World_v5.pptx       # Pitch deck (8 slides)
+│   ├── Hello_E_World_Pitch_Deck.pptx       # Pitch deck (8 slides)
 │   └── RADEON_INFERENCE_OPTIMIZATION_REPORT.md
 ├── model-service/                          # Teammate: GPU model serving
 │   ├── gateway.py                          # OpenAI-compatible API gateway
