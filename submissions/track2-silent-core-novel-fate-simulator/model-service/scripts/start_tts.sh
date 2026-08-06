@@ -5,7 +5,7 @@ set -a
 source /persistent/silent-core/config.env
 set +a
 export HF_HOME=/persistent/silent-core/cache/huggingface
-export HF_ENDPOINT=https://hf-mirror.com
+# HF_ENDPOINT removed — uses huggingface.co by default
 export TTS_MODEL_PATH=/persistent/silent-core/models/Kokoro-82M
 export TTS_ONNX_MODEL_PATH=/persistent/silent-core/models/kokoro-int8-multi-lang-v1_0-git
 export TTS_BACKEND=torch

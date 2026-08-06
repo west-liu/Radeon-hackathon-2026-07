@@ -6,7 +6,6 @@ SOURCE="$ROOT/tools/llama.cpp"
 BUILD="$SOURCE/build-rocm"
 MODEL_DIR="$ROOT/models/Qwen3-8B-GGUF"
 export HF_HOME="$ROOT/cache/huggingface"
-export HF_ENDPOINT=https://hf-mirror.com
 export HF_HUB_DISABLE_XET=1
 
 mkdir -p "$ROOT/tools" "$MODEL_DIR" "$ROOT/run" "$ROOT/logs"

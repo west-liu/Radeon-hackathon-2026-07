@@ -5,7 +5,7 @@ set -a
 source /persistent/silent-core/config.env
 set +a
 export HF_HOME=/persistent/silent-core/cache/huggingface
-export HF_ENDPOINT=https://hf-mirror.com
+# HF_ENDPOINT removed — uses huggingface.co by default
 export IMAGE_MODEL_PATH=/persistent/silent-core/models/Z-Image-Turbo
 export IMAGE_UNLOAD_AFTER_REQUEST=false
 export IMAGE_MAX_INTERNAL_PIXELS=262144
