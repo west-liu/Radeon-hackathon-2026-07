@@ -4,11 +4,25 @@
 
 | Submission field | Value |
 |---|---|
-| Track | Track 2 - Development and Local Deployment of Private AI Agents |
+| Track | Track 2 — Development and Local Deployment of Private AI Agents |
 | Team | Silent Core |
-| Member | asher |
-| Application | Novel Fate Simulator |
-| Submission status | Draft update with verified Radeon model-service evidence |
+| Members | Yunlong Liu (a363915771@126.com), Jinguo Yang (hsjdu9522@gmail.com) |
+| Application | Novel Fate Simulator (product: Hello E World) |
+| Core code repository | https://github.com/west-liu/HelloEWorld |
+
+## Quick Links — Key Materials
+
+| Material | File / Link |
+|---|---|
+| 🎬 **3-5 min Demo Video** | [Hello_E_World_FINAL.mp4](presentation/Hello_E_World_FINAL.mp4) |
+| 📊 **Pitch Deck (PPTX)** | [Hello_E_World_Pitch_Deck.pptx](presentation/Hello_E_World_Pitch_Deck.pptx) |
+| 🌐 **HTML Slides** | [slides.html](presentation/slides.html) (open in browser, F for fullscreen, V for voice) |
+| 🔬 **GPU Inference Report** | [推理报告-RADEON_INFERENCE_OPTIMIZATION_REPORT.md](presentation/推理报告-RADEON_INFERENCE_OPTIMIZATION_REPORT.md) |
+| 📈 **Model Tuning Evidence** | [模型调优.png](presentation/模型调优.png) (Radeon GPU screenshot) |
+| 📋 **Performance Results** | [PERFORMANCE_RESULTS.md](PERFORMANCE_RESULTS.md) |
+| 🔧 **Model API Spec** | [MODEL_API.md](MODEL_API.md) |
+| 📖 **Project Specification** | [PROJECT_SPECIFICATION.md](PROJECT_SPECIFICATION.md) |
+| 👥 **Teammate Model Service** | [model-service/](model-service/) (Jinguo Yang) |
 
 ## One-sentence summary
 
@@ -114,14 +128,6 @@ hostnames and credentials are deliberately excluded from the repository.
 - [AMD Radeon Inference Optimization Report](RADEON_INFERENCE_OPTIMIZATION_REPORT.md)
 - [Model API](MODEL_API.md)
 - [Performance Results](PERFORMANCE_RESULTS.md)
-
-The following required items are still being prepared and are intentionally not
-claimed as complete in this draft:
-
-- complete public application source and English startup README;
-- 3-5 minute end-to-end demo video;
-- English presentation or poster;
-- final English PDF export of the project specification.
 
 ## Honest limitations
 
