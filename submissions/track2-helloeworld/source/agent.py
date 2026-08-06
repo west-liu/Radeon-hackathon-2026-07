@@ -8,7 +8,7 @@ import time
 from typing import AsyncIterator
 from datetime import datetime
 
-from .vllm_client import chat, chat_stream, extract_text, extract_json
+from .llama_client import chat, chat_stream, extract_text, extract_json
 from .tools import (
     PersonalityProfile, ParallelPath, WhatIfReport,
     ONBOARDING_POOL,

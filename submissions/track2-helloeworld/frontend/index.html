@@ -162,7 +162,7 @@
 
   <div class="gpu-badge">
     <div class="gpu-dot"></div>
-    AMD Radeon W7900 · vLLM
+    AMD Radeon W7900 · llama.cpp
   </div>
 
   <div class="btn-row" style="flex-wrap:wrap;">
@@ -204,7 +204,7 @@ async function init() {
       await getNextQuestion();
     }
   } catch(e) {
-    addMsg('ai', 'Could not connect to server. Make sure vLLM is running on port 8000.');
+    addMsg('ai', 'Could not connect to server. Make sure llama.cpp is running on port 8000.');
   }
 }
 
@@ -371,7 +371,7 @@ async function runSimulation() {
 
   } catch(e) {
     document.getElementById(reportId)?.remove();
-    addMsg('ai', `Simulation error: ${e.message}. Is vLLM running?`);
+    addMsg('ai', `Simulation error: ${e.message}. Is llama.cpp running?`);
   }
 
   phase = 'profile_ready';

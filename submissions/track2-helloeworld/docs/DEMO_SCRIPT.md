@@ -16,7 +16,7 @@
 
 > "What if you could see every version of yourself?"
 
-**Fade to**: Browser window. Hello E World UI loads — dark theme, purple accent, sidebar with "AMD Radeon W7900 · vLLM" badge pulsing green.
+**Fade to**: Browser window. Hello E World UI loads — dark theme, purple accent, sidebar with "AMD Radeon W7900 · llama.cpp" badge pulsing green.
 
 **Narration**:
 
@@ -121,7 +121,7 @@ Switch back to the Hello E World UI.
 **Narration**:
 
 > Running entirely on AMD Radeon Pro W7900. Forty-eight gigabytes of VRAM.
-> vLLM serving Qwen 2.5 14B Instruct — forty-five tokens per second.
+> llama.cpp serving Qwen 2.5 14B Instruct — forty-five tokens per second.
 > No API calls. No cloud. Your personality data never leaves this machine.
 
 **End screen** (black, centered text):

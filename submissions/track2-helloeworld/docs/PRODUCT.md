@@ -25,9 +25,9 @@ Hello E World 是一个**人格驱动的 What-If 引擎**。
 
 | 标准 | 说明 | Hello E World 怎么做 |
 |------|------|----------------|
-| **本地部署** | 全程 GPU 推理，不依赖 API | vLLM + Qwen2.5-14B 纯本地 W7900 推理 |
+| **本地部署** | 全程 GPU 推理，不依赖 API | llama.cpp + Qwen2.5-14B 纯本地 W7900 推理 |
 | **Agent 属性** | 记忆/规划/工具调用 | 渐进式人格建模、三路径推演规划、对话记忆链 |
-| **Tool Calling** | 真实调用工具 | vLLM function calling + 人格提取/场景模拟 API |
+| **Tool Calling** | 真实调用工具 | llama.cpp function calling + 人格提取/场景模拟 API |
 | **隐私** | 数据不出本地 | 全部对话和模型存 SQLite，无网络外传 |
 | **实用性** | 解决真实问题 | 帮人理解自己的决策模式，发现盲区 |
 
@@ -60,7 +60,7 @@ Hello E World 是 Track 2 里**唯一**做人格驱动模拟的项目。这就�
 └─────────────────┬───────────────────────────────┘
                   │ httpx (OpenAI-compatible)
 ┌─────────────────▼───────────────────────────────┐
-│  vLLM Server (port 8000)                         │
+│  llama.cpp Server (port 8000)                         │
 │  Qwen/Qwen2.5-14B-Instruct                       │
 │  AMD Radeon Pro W7900 · 48GB VRAM · ROCm 7.2.1   │
 └─────────────────────────────────────────────────┘
@@ -92,7 +92,7 @@ helloeworld/
 │   ├── main.py             ← FastAPI 服务器（12 个端点）
 │   ├── agent.py            ← 核心 Agent（对话/建模/推演）
 │   ├── tools.py            ← 数据结构 + 16 道预设问题
-│   ├── vllm_client.py      ← vLLM OpenAI 兼容客户端
+│   ├── llama_client.py      ← llama.cpp OpenAI 兼容客户端
 │   └── requirements.txt    ← fastapi, uvicorn, httpx, pydantic
 ├── deploy.sh               ← 一键部署脚本（待写）
 └── README.md               ← 英文说明（待写）
@@ -162,7 +162,7 @@ helloeworld/
 - 展示 Bias Analysis + Closing Insight
 
 ### 结尾（30 秒）
-> "Hello E World runs entirely on AMD Radeon Pro W7900 with vLLM. No API calls, no data leaves this machine. Your personality stays yours. Thank you."
+> "Hello E World runs entirely on AMD Radeon Pro W7900 with llama.cpp. No API calls, no data leaves this machine. Your personality stays yours. Thank you."
 
 ---
 
@@ -177,9 +177,9 @@ helloeworld/
 
 ```
 [ ] SSH 到服务器
-[ ] 安装 vLLM (pip install vllm)
+[ ] 安装 llama.cpp (pip install llama-cpp-python)
 [ ] 下载 Qwen2.5-14B-Instruct
-[ ] 启动 vLLM 服务
+[ ] 启动 llama.cpp 服务
 [ ] 部署 Hello E World 代码
 [ ] pip install -r requirements.txt
 [ ] 启动 FastAPI (uvicorn main:app --host 0.0.0.0 --port 8080)
@@ -189,9 +189,9 @@ helloeworld/
 [ ] 浏览器访问 http://36.150.116.206:8080
 ```
 
-### vLLM 启动命令
+### llama.cpp 启动命令
 ```bash
-vllm serve Qwen/Qwen2.5-14B-Instruct \
+llama-server Qwen/Qwen2.5-14B-Instruct \
   --host 0.0.0.0 \
   --port 8000 \
   --max-model-len 8192 \
@@ -202,7 +202,7 @@ vllm serve Qwen/Qwen2.5-14B-Instruct \
 ### FastAPI 启动命令
 ```bash
 cd /workspace/persistent/helloeworld/source
-VLLM_BASE=http://127.0.0.1:8000/v1 uvicorn main:app --host 0.0.0.0 --port 8080
+LLAMA_BASE=http://127.0.0.1:8000/v1 uvicorn main:app --host 0.0.0.0 --port 8080
 ```
 
 ---
@@ -220,14 +220,14 @@ Hello E World 让你从不同平行宇宙的角度观察同一个自己。
 
 | 组件 | 状态 |
 |------|------|
-| 后端代码 (agent.py, main.py, tools.py, vllm_client.py) | ✅ 完成 |
+| 后端代码 (agent.py, main.py, tools.py, llama_client.py) | ✅ 完成 |
 | 前端 UI (index.html) | ✅ 完成 |
 | 产品文档 (PRODUCT.md) | ✅ 完成 |
 | SSH 连接 | ❌ 密钥格式问题 |
-| vLLM 安装 | ❌ 待 SSH |
-| 模型下载 | ❌ 待 vLLM |
+| llama.cpp 安装 | ❌ 待 SSH |
+| 模型下载 | ❌ 待 llama.cpp |
 | 端到端测试 | ❌ 待部署 |
 | README (英文) | ❌ 待写 |
 | Demo 视频 | ❌ 待录 |
 
-**下一步**：解决 SSH → 部署 vLLM + 模型 → 部署 Hello E World → 测试 → 录视频
+**下一步**：解决 SSH → 部署 llama.cpp + 模型 → 部署 Hello E World → 测试 → 录视频

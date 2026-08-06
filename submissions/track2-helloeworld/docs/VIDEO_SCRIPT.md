@@ -91,7 +91,7 @@ Click "🔮 Simulate". Show the report rendering:
 **Screen**: Show terminal with `rocm-smi` output, then back to UI.
 
 **Narration**:
-"Running entirely on AMD Radeon Pro W7900. vLLM. 45 tokens per second. Your personality data never leaves this machine. Hello E World. See every version of yourself."
+"Running entirely on AMD Radeon Pro W7900. llama.cpp. 45 tokens per second. Your personality data never leaves this machine. Hello E World. See every version of yourself."
 
 **End screen**: 
 ```

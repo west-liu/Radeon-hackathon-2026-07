@@ -50,36 +50,36 @@ cd "$CODE_DIR"
 $VENV_PIP install -r requirements.txt >> "$LOG" 2>&1
 log "Deps OK"
 
-# 4. Start vLLM (if not running)
-log "Step 4: Starting vLLM..."
+# 4. Start llama.cpp (if not running)
+log "Step 4: Starting llama.cpp..."
 if ! curl -s http://localhost:8000/v1/models >/dev/null 2>&1; then
-    log "vLLM not running. Starting..."
-    nohup vllm serve Qwen/Qwen2.5-14B-Instruct \
+    log "llama.cpp not running. Starting..."
+    nohup llama-server Qwen/Qwen2.5-14B-Instruct \
         --host 0.0.0.0 --port 8000 \
         --max-model-len 8192 \
         --gpu-memory-utilization 0.90 \
         --dtype auto \
-        > /workspace/persistent/vllm_server.log 2>&1 &
+        > /workspace/persistent/llama_server.log 2>&1 &
 
-    log "Waiting for vLLM to load model (30-60s)..."
+    log "Waiting for llama.cpp to load model (30-60s)..."
     for i in $(seq 1 60); do
         if curl -s http://localhost:8000/v1/models >/dev/null 2>&1; then
-            log "vLLM ready after ${i}s"
+            log "llama.cpp ready after ${i}s"
             break
         fi
         sleep 2
     done
 else
-    log "vLLM already running"
+    log "llama.cpp already running"
 fi
 
-# 5. Verify vLLM
-log "Step 5: Verifying vLLM..."
+# 5. Verify llama.cpp
+log "Step 5: Verifying llama.cpp..."
 MODELS=$(curl -s http://localhost:8000/v1/models 2>/dev/null | head -c 300)
 if [ -n "$MODELS" ]; then
-    log "vLLM OK"
+    log "llama.cpp OK"
 else
-    log "WARNING: vLLM may not be ready. Check /workspace/persistent/vllm_server.log"
+    log "WARNING: llama.cpp may not be ready. Check /workspace/persistent/llama_server.log"
 fi
 
 # 6. Start Hello E World API
@@ -89,7 +89,7 @@ pkill -f "uvicorn main:app" 2>/dev/null || true
 sleep 1
 
 cd "$CODE_DIR"
-VLLM_BASE="http://127.0.0.1:8000/v1" \
+LLAMA_BASE="http://127.0.0.1:8000/v1" \
 nohup $VENV_PYTHON -m uvicorn main:app --host 0.0.0.0 --port 8080 \
     > /workspace/persistent/helloeworld_api.log 2>&1 &
 log "Hello E World API starting..."
@@ -111,7 +111,7 @@ cat <<'SUMMARY'
 ╔══════════════════════════════════════════════════════════════╗
 ║              🔮 Hello E World — Ready                              ║
 ╠══════════════════════════════════════════════════════════════╣
-║  vLLM Server:     http://localhost:8000                      ║
+║  llama.cpp Server:     http://localhost:8000                      ║
 ║  Hello E World API:    http://localhost:8080                      ║
 ║  Frontend:        http://localhost:8080                      ║
 ║                                                              ║
@@ -120,7 +120,7 @@ cat <<'SUMMARY'
 ║  curl -X POST http://localhost:8080/demo/quick-start         ║
 ║                                                              ║
 ║  Logs:                                                       ║
-║  tail -f /workspace/persistent/vllm_server.log               ║
+║  tail -f /workspace/persistent/llama_server.log               ║
 ║  tail -f /workspace/persistent/helloeworld_api.log              ║
 ║  tail -f /workspace/persistent/helloeworld_start.log             ║
 ╚══════════════════════════════════════════════════════════════╝

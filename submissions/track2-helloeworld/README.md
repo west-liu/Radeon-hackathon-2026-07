@@ -28,8 +28,8 @@ Hello E World is a private, local-first AI agent that builds your personality pr
 ## Quick Start
 
 ```bash
-# 1. Start vLLM server (model must be downloaded)
-vllm serve Qwen/Qwen2.5-14B-Instruct \
+# 1. Start llama.cpp server (model must be downloaded)
+llama-server Qwen/Qwen2.5-14B-Instruct \
   --host 0.0.0.0 --port 8000 \
   --max-model-len 8192 \
   --gpu-memory-utilization 0.90
@@ -37,7 +37,7 @@ vllm serve Qwen/Qwen2.5-14B-Instruct \
 # 2. Start Hello E World API
 cd helloeworld/source
 pip install -r requirements.txt
-VLLM_BASE=http://127.0.0.1:8000/v1 uvicorn main:app --host 0.0.0.0 --port 8080
+LLAMA_BASE=http://127.0.0.1:8000/v1 uvicorn main:app --host 0.0.0.0 --port 8080
 
 # 3. Open browser
 # http://localhost:8080
@@ -58,7 +58,7 @@ Browser (index.html)
 FastAPI Server (port 8080)
     │  Session management, personality extraction, simulation
     ▼
-vLLM Server (port 8000)
+llama.cpp Server (port 8000)
     │  Qwen2.5-14B-Instruct on AMD Radeon Pro W7900
     ▼
 SQLite (local) — All data stays on this machine
@@ -85,7 +85,7 @@ SQLite (local) — All data stays on this machine
 ## Why This Can Win
 
 - **0 competitors** in Track 2 (57 projects analyzed, zero what-if/personality simulators)
-- **100% local inference** — vLLM on W7900, no API calls, data never leaves the machine
+- **100% local inference** — llama.cpp on W7900, no API calls, data never leaves the machine
 - **Agent properties** — memory (Q&A history), planning (3-path simulation), tool calling (personality extraction API)
 - **Privacy-first** — all conversations and personality models stored locally in SQLite
 - **Emotionally compelling** — not another code reviewer, not another contract analyzer

@@ -51,7 +51,7 @@ Personality profiles as a basis for complementary team formation, co-founder mat
 └──────────────────────┬───────────────────────────┘
                        │ httpx (OpenAI-compatible)
 ┌──────────────────────▼───────────────────────────┐
-│              vLLM Server (port 8000)               │
+│              llama.cpp Server (port 8000)               │
 │       Qwen/Qwen2.5-14B-Instruct                   │
 │       AMD Radeon Pro W7900 · 48GB VRAM             │
 │       ROCm 7.2.1 · gfx1100                         │
@@ -113,9 +113,9 @@ Pre-loaded 6 Q&A pairs (tech entrepreneur persona) for instant demonstration wit
 
 **Chosen**: Qwen2.5-14B-Instruct — the only model that fits W7900 48GB with production-quality output.
 
-### vLLM Configuration
+### llama.cpp Configuration
 ```bash
-vllm serve Qwen/Qwen2.5-14B-Instruct \
+llama-server Qwen/Qwen2.5-14B-Instruct \
   --host 0.0.0.0 \
   --port 8000 \
   --max-model-len 8192 \
@@ -126,7 +126,7 @@ vllm serve Qwen/Qwen2.5-14B-Instruct \
 ### Deployment Stack
 - **OS**: Ubuntu 24.04
 - **GPU Driver**: ROCm 7.2.1 (gfx1100)
-- **Inference**: vLLM 0.26.0
+- **Inference**: llama.cpp 0.26.0
 - **Backend**: FastAPI + uvicorn
 - **Model Format**: HuggingFace safetensors
 - **Storage**: `/workspace/persistent/` (survives instance restarts)
@@ -152,13 +152,13 @@ vllm serve Qwen/Qwen2.5-14B-Instruct \
 | Token generation | 40-60 tok/s |
 | Personality extraction | <15s for 6 Q&A pairs |
 | What-if simulation | <30s for full 3-path report |
-| Model load time | <60s from vLLM start |
+| Model load time | <60s from llama.cpp start |
 | VRAM utilization | <90% (43.2GB) |
 
 ### 5.4 Fallback Strategy
-If vLLM on W7900 encounters compatibility issues:
+If llama.cpp on W7900 encounters compatibility issues:
 - AMD Token Factory API (Qwen3.6-35B-A3B) at developer.amd.com.cn
-- Already implemented as `VLLMClient` with OpenAI-compatible interface
+- Already implemented as `LlamaClient` with OpenAI-compatible interface
 - Same API contract — zero code changes in agent logic
 
 ---
@@ -180,7 +180,7 @@ If vLLM on W7900 encounters compatibility issues:
 | Application scenarios | Personal decisions, life planning, team matching |
 | Agent architecture diagram | See Section 2 |
 | Core capabilities | Conversational onboarding, personality extraction, what-if simulation |
-| Model & local deployment | Qwen2.5-14B on W7900 via vLLM, full deployment guide |
+| Model & local deployment | Qwen2.5-14B on W7900 via llama.cpp, full deployment guide |
 | Inference optimization | ROCm-specific PyTorch, triton-rocm, HIP graphs, memory tuning |
 | Source code | Complete at `helloeworld/source/` with README |
 | Demo video | 3:30 scripted demonstration with GPU evidence |

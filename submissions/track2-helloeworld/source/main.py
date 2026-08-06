@@ -1,7 +1,7 @@
 """
 Hello E World — FastAPI Server
 Onboarding → Personality Extraction → What-If Simulation
-All inference on local AMD Radeon GPU via vLLM.
+All inference on local AMD Radeon GPU via llama.cpp.
 """
 
 import os
@@ -20,7 +20,7 @@ from agent import (
 )
 from tools import PersonalityProfile, WhatIfReport
 
-VLLM_BASE = os.getenv("VLLM_BASE", "http://127.0.0.1:8000/v1")
+LLAMA_BASE = os.getenv("LLAMA_BASE", "http://127.0.0.1:8000/v1")
 
 # ─── State (per-session, in-memory for MVP) ──────────────────────
 qa_history: list[dict] = []
@@ -32,7 +32,7 @@ profile: PersonalityProfile | None = None
 async def lifespan(app: FastAPI):
     print("\n" + "=" * 60)
     print("🔮 Hello E World — Parallel Universe Simulator")
-    print(f"   vLLM: {VLLM_BASE}")
+    print(f"   llama.cpp: {LLAMA_BASE}")
     print("   GPU:  AMD Radeon Pro W7900 (48GB)")
     print("=" * 60 + "\n")
     yield
@@ -68,7 +68,7 @@ async def index():
 async def health():
     return {
         "status": "ok",
-        "vllm": VLLM_BASE,
+        "llama": LLAMA_BASE,
         "gpu": "AMD Radeon Pro W7900 (48GB)",
         "qa_count": len(qa_history),
         "has_profile": profile is not None,
@@ -84,7 +84,7 @@ async def next_question():
         q = await get_next_question(qa_history)
         return {"question": q, "question_number": len(qa_history) + 1}
     except Exception as e:
-        raise HTTPException(status_code=502, detail=f"vLLM error: {str(e)}")
+        raise HTTPException(status_code=502, detail=f"llama.cpp error: {str(e)}")
 
 
 @app.post("/onboard/answer")
@@ -124,7 +124,7 @@ async def extract():
             "qa_count": len(qa_history),
         }
     except Exception as e:
-        raise HTTPException(status_code=502, detail=f"vLLM error: {str(e)}")
+        raise HTTPException(status_code=502, detail=f"llama.cpp error: {str(e)}")
 
 
 @app.get("/personality")
@@ -150,37 +150,7 @@ async def simulate(req: ScenarioRequest):
             "markdown": report.format_markdown(),
         }
     except Exception as e:
-        raise HTTPException(status_code=502, detail=f"vLLM error: {str(e)}")
-
-
-@app.post("/simulate/stream")
-async def simulate_stream(req: ScenarioRequest):
-    """Run what-if simulation with SSE streaming."""
-    global profile
-    if profile is None:
-        raise HTTPException(status_code=400, detail="Extract personality first")
-
-    async def event_stream():
-        try:
-            buffer = ""
-            async for token in simulate_whatif_stream(profile, req.scenario):
-                buffer += token
-                yield f"data: {json.dumps({'token': token})}\n\n"
-            # Send final report
-            import re
-            cleaned = buffer.strip()
-            if cleaned.startswith("```"):
-                cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned)
-                cleaned = re.sub(r"\s*```$", "", cleaned)
-            try:
-                data = json.loads(cleaned)
-                yield f"data: {json.dumps({'done': True, 'report': data})}\n\n"
-            except json.JSONDecodeError:
-                yield f"data: {json.dumps({'done': True, 'raw': buffer})}\n\n"
-        except Exception as e:
-            yield f"data: {json.dumps({'error': str(e)})}\n\n"
-
-    return StreamingResponse(event_stream(), media_type="text/event-stream")
+        raise HTTPException(status_code=502, detail=f"llama.cpp error: {str(e)}")
 
 
 # ─── Stress Test ──────────────────────────────────────────────────
@@ -196,7 +166,7 @@ async def stress_test(req: StressTestRequest):
         result = await stress_test_idea(req.idea, req.context)
         return {"idea": req.idea, "result": result}
     except Exception as e:
-        raise HTTPException(status_code=502, detail=f"vLLM error: {str(e)}")
+        raise HTTPException(status_code=502, detail=f"llama.cpp error: {str(e)}")
 
 
 # ─── Reset ───────────────────────────────────────────────────────

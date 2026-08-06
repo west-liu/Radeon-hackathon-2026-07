@@ -1,6 +1,6 @@
 """
-Hello E World — vLLM Client
-Calls local vLLM server running Qwen2.5-14B-Instruct on W7900.
+Hello E World — llama.cpp Client
+Calls local llama.cpp server running Qwen2.5-14B-Instruct on W7900.
 """
 
 import os
@@ -8,9 +8,9 @@ import json
 import httpx
 from typing import Optional, AsyncIterator
 
-VLLM_BASE = os.getenv("VLLM_BASE", "http://127.0.0.1:8000/v1")
-VLLM_MODEL = os.getenv("VLLM_MODEL", "Qwen/Qwen2.5-14B-Instruct")
-VLLM_TIMEOUT = int(os.getenv("VLLM_TIMEOUT", "120"))
+LLAMA_BASE = os.getenv("LLAMA_BASE", "http://127.0.0.1:8000/v1")
+LLAMA_MODEL = os.getenv("LLAMA_MODEL", "Qwen2.5-14B-Instruct")
+LLAMA_TIMEOUT = int(os.getenv("LLAMA_TIMEOUT", "120"))
 
 
 async def chat(
@@ -20,7 +20,7 @@ async def chat(
     max_tokens: int = 2048,
     stream: bool = False,
 ) -> dict:
-    """Call vLLM (OpenAI-compatible API)."""
+    """Call llama.cpp server (OpenAI-compatible API)."""
     headers = {"Content-Type": "application/json"}
     messages = []
     if system:
@@ -28,15 +28,15 @@ async def chat(
     messages.append({"role": "user", "content": prompt})
 
     payload = {
-        "model": VLLM_MODEL,
+        "model": LLAMA_MODEL,
         "messages": messages,
         "temperature": temperature,
         "max_tokens": max_tokens,
     }
 
-    async with httpx.AsyncClient(timeout=VLLM_TIMEOUT) as client:
+    async with httpx.AsyncClient(timeout=LLAMA_TIMEOUT) as client:
         resp = await client.post(
-            f"{VLLM_BASE}/chat/completions",
+            f"{LLAMA_BASE}/chat/completions",
             headers=headers,
             json=payload,
         )
@@ -50,7 +50,7 @@ async def chat_stream(
     temperature: float = 0.7,
     max_tokens: int = 2048,
 ) -> AsyncIterator[str]:
-    """Stream tokens from vLLM."""
+    """Stream tokens from llama.cpp server."""
     headers = {"Content-Type": "application/json"}
     messages = []
     if system:
@@ -58,17 +58,17 @@ async def chat_stream(
     messages.append({"role": "user", "content": prompt})
 
     payload = {
-        "model": VLLM_MODEL,
+        "model": LLAMA_MODEL,
         "messages": messages,
         "temperature": temperature,
         "max_tokens": max_tokens,
         "stream": True,
     }
 
-    async with httpx.AsyncClient(timeout=VLLM_TIMEOUT) as client:
+    async with httpx.AsyncClient(timeout=LLAMA_TIMEOUT) as client:
         async with client.stream(
             "POST",
-            f"{VLLM_BASE}/chat/completions",
+            f"{LLAMA_BASE}/chat/completions",
             headers=headers,
             json=payload,
         ) as resp:
