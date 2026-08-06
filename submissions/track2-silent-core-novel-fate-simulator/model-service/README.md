@@ -1,7 +1,8 @@
 # Silent Core Model API
 
-English-first, OpenAI-compatible model infrastructure for the Radeon Hackathon.
-The application layer is intentionally out of scope.
+This directory contains the English-first, OpenAI-compatible model-serving
+layer used by Novel Fate Simulator. The application consumes it through stable
+model IDs, while this directory remains independently testable.
 
 ## Public API
 
