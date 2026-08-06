@@ -126,28 +126,28 @@ html, body { background: var(--bg); color: var(--text); font-family: var(--font)
   <div style="width: 100%; max-width: 900px;">
     <pre class="mermaid">
 flowchart TB
-    subgraph Frontend["Browser (React + Tailwind)"]
-        UI[Chat UI / VN Mode]
+    subgraph Frontend ["Browser (React + Tailwind)"]
+        UI["Chat UI / VN Mode"]
     end
-    subgraph APILayer["FastAPI Server (Port 8080)"]
-        FG[Foreground Agent<br/>Scene Director]
-        ANALYZE[Novel Analyzer]
-        CHAT[NPC Chat Engine]
-        IMG[Image Gen API]
+    subgraph APILayer ["FastAPI Server (Port 8080)"]
+        FG["Foreground Agent"]
+        ANALYZE["Novel Analyzer"]
+        CHAT["NPC Chat Engine"]
+        IMG["Image Gen API"]
     end
-    subgraph WorkerLayer["Background Worker"]
-        BG[Background Agent<br/>Fate Simulation]
-        RAG[Ice Library RAG<br/>SQLite + FTS]
+    subgraph WorkerLayer ["Background Worker"]
+        BG["Background Agent"]
+        RAG["Ice Library RAG"]
     end
-    subgraph StateLayer["State & Storage"]
-        REDIS[(Redis<br/>WorldState / Events)]
-        PG[(PostgreSQL<br/>Persistent Data)]
-        SQLITE[(SQLite Ice Library<br/>Canon Lore)]
+    subgraph StateLayer ["State & Storage"]
+        REDIS[("Redis<br/>WorldState / Events")]
+        PG[("PostgreSQL<br/>Persistent Data")]
+        SQLITE[("SQLite Ice Library<br/>Canon Lore")]
     end
-    subgraph GPULayer["AMD Radeon GPU"]
-        LLAMA[llama.cpp Server<br/>Qwen2.5-14B-Instruct]
-        ROCM[ROCm 7.2.1]
-        GPU[Radeon Pro W7900]
+    subgraph GPULayer ["AMD Radeon GPU"]
+        LLAMA["llama.cpp Server<br/>Qwen2.5-14B-Instruct"]
+        ROCM["ROCm 7.2.1"]
+        GPU["Radeon Pro W7900"]
     end
     UI -->|SSE Stream| FG
     FG -->|HTTP| LLAMA
