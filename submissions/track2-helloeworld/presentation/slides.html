@@ -42,14 +42,14 @@ html, body { background: var(--bg); color: var(--text); font-family: var(--font)
 
 .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem; text-align: left; }
 .card h3 { font-size: 1rem; font-weight: 600; color: var(--accent); margin-bottom: 0.5rem; }
-.card p { font-size: 0.85rem; color: var(--text-dim); line-height: 1.5; }
+.card p { font-size: 1.05rem; color: var(--text-dim); line-height: 1.6; }
 
-.check { display: flex; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.6rem; font-size: 0.9rem; }
+.check { display: flex; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.6rem; font-size: 1.05rem; }
 .check::before { content: "✓"; color: var(--accent3); font-weight: 700; flex-shrink: 0; }
 
-.code-block { background: #0a0a0f; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; font-family: var(--mono); font-size: 0.8rem; color: var(--text-dim); width: 100%; max-width: 700px; overflow-x: auto; line-height: 1.6; }
+.code-block { background: #0a0a0f; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; font-family: var(--mono); font-size: 0.95rem; color: var(--text-dim); width: 100%; max-width: 700px; overflow-x: auto; line-height: 1.6; }
 
-.tbl { width: 100%; max-width: 800px; border-collapse: collapse; font-size: 0.85rem; }
+.tbl { width: 100%; max-width: 800px; border-collapse: collapse; font-size: 1rem; }
 .tbl th, .tbl td { padding: 0.6rem 0.8rem; text-align: left; border-bottom: 1px solid var(--border); }
 .tbl th { color: var(--accent); font-weight: 600; }
 .tbl td { color: var(--text-dim); }
@@ -108,7 +108,7 @@ html, body { background: var(--bg); color: var(--text); font-family: var(--font)
   <div class="slide-title">Track 2 Checklist</div>
   <h2>Why Hello E World Wins Track 2</h2>
   <div style="width: 100%; max-width: 700px;">
-    <div class="check"><strong>Local GPU Inference</strong> — Qwen2.5-14B runs 100% on Radeon Pro W7900 via vLLM + ROCm. Zero API calls.</div>
+    <div class="check"><strong>Local GPU Inference</strong> — Qwen2.5-14B runs 100% on Radeon Pro W7900 via llama.cpp + ROCm. Zero API calls.</div>
     <div class="check"><strong>Agent Properties</strong> — Dual-agent architecture: Foreground (real-time scene director) + Background (fate simulation worker).</div>
     <div class="check"><strong>Memory</strong> — WorldState machine persists across sessions. Redis + PostgreSQL store narrative state, relationship graphs, divergence metrics.</div>
     <div class="check"><strong>Planning</strong> — Background Worker consumes events via Redis Streams, generates JSON Patch state updates, handles butterfly-effect propagation.</div>
@@ -145,22 +145,22 @@ flowchart TB
         SQLITE[(SQLite Ice Library<br/>Canon Lore)]
     end
     subgraph GPULayer["AMD Radeon GPU"]
-        VLLM[vLLM Server<br/>Qwen2.5-14B-Instruct]
+        LLAMA[llama.cpp Server<br/>Qwen2.5-14B-Instruct]
         ROCM[ROCm 7.2.1]
         GPU[Radeon Pro W7900]
     end
     UI -->|SSE Stream| FG
-    FG -->|HTTP| VLLM
+    FG -->|HTTP| LLAMA
     FG -->|Emit Events| REDIS
     BG -->|Consume Events| REDIS
     BG -->|RAG Query| SQLITE
-    BG -->|HTTP| VLLM
+    BG -->|HTTP| LLAMA
     BG -->|Patch| REDIS
-    ANALYZE -->|HTTP| VLLM
-    CHAT -->|HTTP| VLLM
-    IMG -->|HTTP| VLLM
+    ANALYZE -->|HTTP| LLAMA
+    CHAT -->|HTTP| LLAMA
+    IMG -->|HTTP| LLAMA
     REDIS -->|Persist| PG
-    VLLM --> ROCM --> GPU
+    LLAMA --> ROCM --> GPU
     </pre>
   </div>
 </section>
@@ -189,15 +189,15 @@ flowchart TB
 # 1. Install ROCm + PyTorch (one-time)
 pip install torch torchvision --index-url https://download.pytorch.org/whl/rocm7.0
 
-# 2. Start vLLM with Qwen2.5-14B
-vllm serve Qwen/Qwen2.5-14B-Instruct \
+# 2. Start llama.cpp server with Qwen2.5-14B
+llama-server -m Qwen2.5-14B-Instruct.gguf \
   --host 0.0.0.0 --port 8000 \
-  --max-model-len 8192 --gpu-memory-utilization 0.90
+  --ctx-size 8192 --n-gpu-layers 99
 
 # 3. Start Hello E World API
 cd helloeworld/source
 pip install -r requirements.txt
-VLLM_BASE=http://127.0.0.1:8000/v1 uvicorn main:app --host 0.0.0.0 --port 8080
+LLAMA_BASE=http://127.0.0.1:8000/v1 uvicorn main:app --host 0.0.0.0 --port 8080
 
 # 4. Open browser
 # http://localhost:8080
@@ -218,7 +218,7 @@ sequenceDiagram
     participant FG as Foreground Agent
     participant REDIS as Redis Streams
     participant BG as Background Worker
-    participant GPU as vLLM / W7900
+    participant GPU as llama.cpp / W7900
     User->>FG: Player action / choice
     FG->>GPU: Generate scene + options (SSE stream)
     GPU-->>FG: scene_chunk + actions
@@ -269,7 +269,7 @@ sequenceDiagram
       <strong style="color: var(--accent2);">Technical Depth:</strong> Dual-agent architecture, Redis event bus, optimistic locking, RAG lore retrieval, SSE streaming.
     </div>
     <div style="margin-bottom: 1rem; padding: 1rem; background: var(--bg-card); border-radius: 8px; border-left: 3px solid var(--accent3);">
-      <strong style="color: var(--accent3);">AMD Native:</strong> vLLM + ROCm on Radeon Pro W7900. 100% local inference. No API dependency.
+      <strong style="color: var(--accent3);">AMD Native:</strong> llama.cpp + ROCm on Radeon Pro W7900. 100% local inference. No API dependency.
     </div>
     <div style="padding: 1rem; background: var(--bg-card); border-radius: 8px; border-left: 3px solid var(--radeon);">
       <strong style="color: var(--radeon);">Privacy First:</strong> User novels, chats, world states never leave the machine. True private AI agent.
