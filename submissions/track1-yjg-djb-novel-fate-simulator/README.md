@@ -1,7 +1,8 @@
 # Novel Fate Simulator
 
 **Track:** Track 1 - Development of Multimodal Content Creation Tools  
-**Applicant:** `yjg-djb` (working placeholder; replace with the registered team or applicant name)  
+**Team:** Silent Core  
+**Member:** Asher  
 **Submission status:** Draft - required deliverables are still being completed.
 
 ## Project Overview
