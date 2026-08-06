@@ -38,6 +38,16 @@ See `examples/python_client.py` for chat, image, and speech client code.
 - Ubuntu 22.04, ROCm 7.2+
 - ~30 GB storage for models + tools
 
+### 0. Prerequisites
+
+ROCm must be installed and working:
+```bash
+rocm-smi                    # Should show your GPU
+rocminfo | grep "Name:"     # Should list gfx1100 (or your GPU target)
+```
+
+If ROCm is not installed, follow the [AMD ROCm installation guide](https://rocm.docs.amd.com/en/latest/deploy/linux/install.html).
+
 ### 1. System dependencies
 
 ```bash
