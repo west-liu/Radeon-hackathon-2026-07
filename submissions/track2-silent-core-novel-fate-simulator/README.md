@@ -20,7 +20,8 @@
 | 📋 **Performance Results** | [PERFORMANCE_RESULTS.md](PERFORMANCE_RESULTS.md) |
 | 🔧 **Model API Spec** | [MODEL_API.md](MODEL_API.md) |
 | 📖 **Project Specification** | [PROJECT_SPECIFICATION.md](PROJECT_SPECIFICATION.md) |
-| 👥 **Teammate Model Service** | [model-service/](model-service/) (Jinguo Yang) |
+| 👥 **Model Service** | [model-service/](model-service/) (Jinguo Yang) |
+| 🚀 **Model Deployment Guide** | [MODEL_DEPLOY.md](model-service/MODEL_DEPLOY.md) |
 
 ## One-sentence summary
 
