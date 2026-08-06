@@ -48,5 +48,6 @@ The current `trycloudflare.com` URL is a temporary demo tunnel. It changes when
 the tunnel or instance restarts and Cloudflare does not guarantee SSE for Quick
 Tunnels. Use a named tunnel or direct HTTPS for the competition demo.
 
-See `PERFORMANCE_RESULTS.md` for reproducible before/after measurements and
-`API.md` for the application integration contract.
+See [performance results](../PERFORMANCE_RESULTS.md) for reproducible before/after
+measurements and [the model API](../MODEL_API.md) for the application integration
+contract.
