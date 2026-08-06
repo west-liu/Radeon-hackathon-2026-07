@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parallex — See Every Version of Yourself</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --border: #252530;
+    --text: #e0e0e8;
+    --dim: #707080;
+    --accent: #a78bfa;
+    --accent-glow: #c4b5fd;
+    --path-a: #60a5fa;
+    --path-b: #34d399;
+    --path-c: #f87171;
+    --danger: #ef4444;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; display: flex;
+  }
+
+  /* Layout */
+  .sidebar {
+    width: 280px; background: var(--surface); border-right: 1px solid var(--border);
+    padding: 2rem 1.5rem; display: flex; flex-direction: column; gap: 1.5rem;
+    flex-shrink: 0;
+  }
+  .main { flex: 1; display: flex; flex-direction: column; max-width: 800px; }
+  .logo { font-size: 1.5rem; font-weight: 700; color: var(--accent); letter-spacing: -0.02em; }
+  .logo span { color: var(--dim); font-weight: 400; }
+
+  /* Sidebar state */
+  .state-item { margin-bottom: 1rem; }
+  .state-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--dim); margin-bottom: 0.25rem; }
+  .state-value { font-size: 0.9rem; }
+  .state-value.active { color: var(--accent-glow); }
+  .state-value.done { color: #34d399; }
+
+  /* GPU badge */
+  .gpu-badge {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: linear-gradient(135deg, #1a1030, #0d1525);
+    border: 1px solid #302050; border-radius: 8px; padding: 0.75rem 1rem;
+    font-size: 0.8rem; color: var(--accent-glow);
+  }
+  .gpu-dot { width: 8px; height: 8px; border-radius: 50%; background: #34d399; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* Chat area */
+  .chat { flex: 1; overflow-y: auto; padding: 2rem; display: flex; flex-direction: column; gap: 1rem; }
+  .msg {
+    max-width: 85%; padding: 1rem 1.25rem; border-radius: 12px;
+    line-height: 1.6; font-size: 0.95rem; animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .msg.ai {
+    align-self: flex-start; background: var(--surface); border: 1px solid var(--border);
+    border-bottom-left-radius: 4px;
+  }
+  .msg.user {
+    align-self: flex-end; background: linear-gradient(135deg, #2d1b69, #1e1245);
+    border-bottom-right-radius: 4px;
+  }
+  .msg.report {
+    align-self: flex-start; background: #0f0f1a; border: 1px solid #252540;
+    max-width: 95%; font-size: 0.9rem;
+  }
+
+  /* Input area */
+  .input-area {
+    padding: 1.5rem 2rem; border-top: 1px solid var(--border);
+    display: flex; gap: 0.75rem; align-items: flex-end;
+  }
+  .input-area textarea {
+    flex: 1; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 0.75rem 1rem; color: var(--text);
+    font-family: inherit; font-size: 0.95rem; resize: none;
+    min-height: 44px; max-height: 120px;
+  }
+  .input-area textarea:focus { outline: none; border-color: var(--accent); }
+  .input-area textarea::placeholder { color: var(--dim); }
+  .input-area button {
+    background: var(--accent); color: #0a0a0f; border: none;
+    border-radius: 8px; padding: 0.75rem 1.5rem; font-weight: 600;
+    font-size: 0.9rem; cursor: pointer; white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .input-area button:hover { background: var(--accent-glow); }
+  .input-area button:disabled { background: var(--border); color: var(--dim); cursor: not-allowed; }
+
+  /* What-if input (different style) */
+  .whatif-bar {
+    padding: 1.5rem 2rem; border-top: 1px solid var(--border);
+    display: flex; gap: 0.75rem; align-items: center;
+  }
+  .whatif-bar input {
+    flex: 1; background: var(--surface); border: 1px solid #302050;
+    border-radius: 8px; padding: 0.75rem 1rem; color: var(--text);
+    font-size: 1rem; font-family: inherit;
+  }
+  .whatif-bar input:focus { outline: none; border-color: var(--accent); }
+  .whatif-bar input::placeholder { color: var(--dim); font-style: italic; }
+
+  /* Report styling */
+  .report-path { margin: 1.5rem 0; padding-left: 1rem; border-left: 3px solid; }
+  .report-path.a { border-color: var(--path-a); }
+  .report-path.b { border-color: var(--path-b); }
+  .report-path.c { border-color: var(--path-c); }
+  .report-path h3 { margin-bottom: 0.5rem; }
+  .report-path ul { padding-left: 1.25rem; color: var(--dim); }
+  .report-path li { margin: 0.3rem 0; }
+
+  /* Buttons */
+  .btn-row { display: flex; gap: 0.5rem; margin-top: 1rem; }
+  .btn {
+    padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.85rem;
+    cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--text);
+    transition: all 0.2s;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent-glow); }
+  .btn.accent { background: var(--accent); color: #0a0a0f; border: none; font-weight: 600; }
+
+  /* Loading */
+  .typing { color: var(--accent); animation: blink 1s infinite; }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    body { flex-direction: column; }
+    .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; padding: 1rem; gap: 0.75rem; }
+    .sidebar > * { flex: 1; min-width: 120px; }
+  }
+
+  .small { font-size: 0.75rem; color: var(--dim); }
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="logo">Parallex <span>⨀</span></div>
+
+  <div>
+    <div class="state-item">
+      <div class="state-label">Phase</div>
+      <div class="state-value active" id="phaseDisplay">Onboarding</div>
+    </div>
+    <div class="state-item">
+      <div class="state-label">Questions Answered</div>
+      <div class="state-value" id="qaCount">0</div>
+    </div>
+    <div class="state-item">
+      <div class="state-label">Personality</div>
+      <div class="state-value" id="profileStatus">—</div>
+    </div>
+  </div>
+
+  <div class="gpu-badge">
+    <div class="gpu-dot"></div>
+    AMD Radeon W7900 · vLLM
+  </div>
+
+  <div class="btn-row" style="flex-wrap:wrap;">
+    <button class="btn" onclick="resetAll()">⟳ Reset</button>
+    <button class="btn" onclick="demoQuickStart()">⚡ Demo</button>
+  </div>
+  <div class="small">Demo: preload 6 answers, jump to simulation.</div>
+</div>
+
+<div class="main">
+  <div class="chat" id="chat"></div>
+  <div class="input-area" id="inputArea">
+    <textarea id="userInput" placeholder="Type your answer..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAnswer();}"></textarea>
+    <button id="sendBtn" onclick="sendAnswer()">Send</button>
+  </div>
+</div>
+
+<script>
+// ─── State ───────────────────────────────────────────────────────
+let phase = 'onboarding';  // onboarding | profile_ready | simulating
+let qaCount = 0;
+let hasProfile = false;
+let currentQuestion = '';
+
+// ─── Init ────────────────────────────────────────────────────────
+async function init() {
+  try {
+    let resp = await fetch('/health');
+    let h = await resp.json();
+    qaCount = h.qa_count || 0;
+    hasProfile = h.has_profile || false;
+    if (hasProfile) {
+      phase = 'profile_ready';
+      updatePhase();
+      addMsg('ai', "Welcome back! Your personality profile is ready. Ask me a what-if question below.");
+      showWhatIfBar();
+    } else {
+      addMsg('ai', 'Hi. I\'m not a form, and I\'m not a chatbot. I\'m here to understand how you think — so I can show you the versions of yourself that different choices would create.');
+      await getNextQuestion();
+    }
+  } catch(e) {
+    addMsg('ai', 'Could not connect to server. Make sure vLLM is running on port 8000.');
+  }
+}
+
+async function getNextQuestion() {
+  try {
+    let resp = await fetch('/onboard/next-question');
+    if (!resp.ok) throw new Error('Server error');
+    let data = await resp.json();
+    currentQuestion = data.question;
+    qaCount = data.question_number - 1;
+    updatePhase();
+    addMsg('ai', currentQuestion);
+  } catch(e) {
+    addMsg('ai', 'I have enough to work with. Click <b>Extract Profile</b> when ready.');
+    document.getElementById('inputArea').innerHTML = `
+      <button class="btn accent" onclick="extractProfile()" style="width:100%;">🔮 Extract My Personality</button>
+    `;
+  }
+}
+
+// ─── Send Answer ─────────────────────────────────────────────────
+async function sendAnswer() {
+  let input = document.getElementById('userInput');
+  let answer = input.value.trim();
+  if (!answer) return;
+
+  addMsg('user', answer);
+  input.value = '';
+  document.getElementById('sendBtn').disabled = true;
+  input.disabled = true;
+
+  // Submit answer
+  await fetch('/onboard/answer', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({answer})
+  });
+
+  qaCount++;
+  updatePhase();
+
+  // Show "thinking" message
+  let thinkingId = addMsg('ai', '<span class="typing">···</span>');
+
+  // Get next question
+  if (qaCount >= 5) {
+    document.getElementById(thinkingId) && document.getElementById(thinkingId).remove();
+    addMsg('ai', "I've learned a lot about you. Ready to see your personality profile?");
+    document.getElementById('inputArea').innerHTML = `
+      <button class="btn accent" onclick="extractProfile()" style="width:100%;">🔮 Extract My Personality</button>
+      <button class="btn" onclick="continueOnboarding()" style="width:100%;margin-top:0.5rem;">Ask me more questions</button>
+    `;
+  } else {
+    // Remove thinking, get next question
+    document.getElementById(thinkingId)?.remove();
+    await getNextQuestion();
+  }
+
+  document.getElementById('sendBtn').disabled = false;
+  input.disabled = false;
+  input.focus();
+}
+
+async function continueOnboarding() {
+  document.getElementById('inputArea').innerHTML = `
+    <textarea id="userInput" placeholder="Type your answer..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAnswer();}"></textarea>
+    <button id="sendBtn" onclick="sendAnswer()">Send</button>
+  `;
+  addMsg('ai', 'Alright. Let me ask you something else.');
+  await getNextQuestion();
+}
+
+// ─── Extract Profile ─────────────────────────────────────────────
+async function extractProfile() {
+  addMsg('ai', '<span class="typing">Analyzing your answers, building your personality model...</span>');
+  try {
+    let resp = await fetch('/personality/extract', {method:'POST'});
+    if (!resp.ok) throw new Error('Extraction failed');
+    let data = await resp.json();
+    hasProfile = true;
+    phase = 'profile_ready';
+    updatePhase();
+    document.getElementById('profileStatus').textContent = '✅ Ready';
+    document.getElementById('profileStatus').className = 'state-value done';
+
+    // Show profile summary
+    let p = data.profile;
+    addMsg('ai', `<b>I see you.</b><br><br>
+      <b>Risk style:</b> ${p.risk_tolerance}<br>
+      <b>Decision style:</b> ${p.decision_style}<br>
+      <b>Values:</b> ${(p.value_ranking||[]).join(', ')}<br>
+      <b>Strengths:</b> ${(p.strengths||[]).join(', ')}<br>
+      <b>Blind spots:</b> ${(p.blind_spots||[]).join(', ')}<br><br>
+      <i>${p.raw_summary}</i>`);
+
+    addMsg('ai', 'Now ask me a <b>what-if</b> question.<br><br><i>Examples:</i><br>• "What if I had never left my first job?"<br>• "What if I move to Tokyo next year?"<br>• "What if I say yes to the co-founder offer?"');
+    showWhatIfBar();
+  } catch(e) {
+    addMsg('ai', `Something went wrong: ${e.message}. Try answering a few more questions first.`);
+  }
+}
+
+// ─── Show What-If input ──────────────────────────────────────────
+function showWhatIfBar() {
+  document.getElementById('inputArea').innerHTML = `
+    <div class="whatif-bar" style="width:100%;">
+      <input id="whatIfInput" type="text" placeholder="What if...?" onkeydown="if(event.key==='Enter'){runSimulation();}">
+      <button onclick="runSimulation()">🔮 Simulate</button>
+    </div>
+  `;
+}
+
+// ─── Run Simulation ──────────────────────────────────────────────
+async function runSimulation() {
+  let input = document.getElementById('whatIfInput');
+  if (!input) return;
+  let scenario = input.value.trim();
+  if (!scenario) return;
+
+  addMsg('user', '🔮 ' + scenario);
+  input.value = '';
+  phase = 'simulating';
+  updatePhase();
+
+  let reportId = addMsg('ai', '<span class="typing">Simulating parallel universes on AMD Radeon GPU...</span>');
+
+  try {
+    let resp = await fetch('/simulate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({scenario})
+    });
+    if (!resp.ok) throw new Error('Simulation failed');
+
+    let data = await resp.json();
+    document.getElementById(reportId)?.remove();
+
+    // Render report
+    let r = data.report;
+    let html = `<div class="msg report">`;
+    html += `<h2 style="color:var(--accent);margin-bottom:0.25rem;">🔮 ${r.scenario}</h2>`;
+    html += `<p style="color:var(--dim);">${r.personality_summary}</p>`;
+
+    for (let p of (r.paths||[])) {
+      let cls = p.label.includes('A') ? 'a' : p.label.includes('B') ? 'b' : 'c';
+      html += `<div class="report-path ${cls}">`;
+      html += `<h3 style="color:var(--path-${cls});">${p.label}</h3>`;
+      html += `<p>${p.description}</p>`;
+      html += `<p style="color:var(--dim);margin-top:0.5rem;"><b>Emotion:</b> ${p.emotional_state}</p>`;
+      html += `<p style="color:var(--dim);"><b>Tradeoffs:</b></p><ul>${(p.key_tradeoffs||[]).map(t=>'<li>'+t+'</li>').join('')}</ul>`;
+      html += `<p style="color:var(--dim);"><b>Surprises:</b></p><ul>${(p.surprises||[]).map(s=>'<li>'+s+'</li>').join('')}</ul>`;
+      html += `</div>`;
+    }
+
+    html += `<h3 style="color:var(--accent);">🎯 Bias Analysis</h3><p>${r.bias_analysis}</p>`;
+    html += `<h3 style="color:var(--accent);">📊 Uncertainty Map</h3><p>${r.uncertainty_map}</p>`;
+    html += `<blockquote style="border-left:3px solid var(--accent);padding-left:1rem;color:var(--accent-glow);margin-top:1rem;">${r.closing_insight}</blockquote>`;
+    html += `</div>`;
+
+    document.getElementById('chat').insertAdjacentHTML('beforeend', html);
+    document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
+
+    addMsg('ai', 'Ask another what-if, or <b onclick="resetAll()" style="cursor:pointer;color:var(--accent);">start over</b>.');
+
+  } catch(e) {
+    document.getElementById(reportId)?.remove();
+    addMsg('ai', `Simulation error: ${e.message}. Is vLLM running?`);
+  }
+
+  phase = 'profile_ready';
+  updatePhase();
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────
+function addMsg(role, content) {
+  let id = 'msg-' + Date.now();
+  let cls = role === 'ai' ? 'msg ai' : role === 'user' ? 'msg user' : 'msg report';
+  document.getElementById('chat').insertAdjacentHTML('beforeend',
+    `<div class="${cls}" id="${id}">${content}</div>`);
+  document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
+  return id;
+}
+
+function updatePhase() {
+  document.getElementById('qaCount').textContent = qaCount;
+  let pd = document.getElementById('phaseDisplay');
+  pd.textContent = phase === 'onboarding' ? 'Onboarding' :
+                    phase === 'profile_ready' ? 'Ready' :
+                    phase === 'simulating' ? 'Simulating...' : phase;
+}
+
+async function resetAll() {
+  await fetch('/reset', {method:'POST'});
+  qaCount = 0; hasProfile = false; phase = 'onboarding';
+  updatePhase();
+  document.getElementById('profileStatus').textContent = '—';
+  document.getElementById('chat').innerHTML = '';
+  document.getElementById('inputArea').innerHTML = `
+    <textarea id="userInput" placeholder="Type your answer..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAnswer();}"></textarea>
+    <button id="sendBtn" onclick="sendAnswer()">Send</button>
+  `;
+  await init();
+}
+
+async function demoQuickStart() {
+  await fetch('/demo/quick-start', {method:'POST'});
+  document.getElementById('chat').innerHTML = '';
+  addMsg('ai', '⚡ Demo mode: 6 answers preloaded. Extracting personality...');
+  await extractProfile();
+}
+
+// ─── Go ──────────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
