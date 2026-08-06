@@ -59,6 +59,168 @@ The product is not presented as autonomous function calling. Tool invocation is
 performed by the application orchestrator, and private-knowledge grounding is
 implemented through structured lore, canon anchors, and WorldState retrieval.
 
+## System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         User Browser                             │
+│                    http://localhost:3002                         │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │ HTTP/SSE (Vite proxy → :8080)
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                   Frontend (React 19 + Vite)                     │
+│                                                                  │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐           │
+│  │ Gameplay │ │  Books   │ │  NPC     │ │  VN      │           │
+│  │ Screen   │ │  List    │ │  Chat    │ │  Mode    │           │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘           │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │ REST API + SSE Streams
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                   Backend (FastAPI + Uvicorn)                    │
+│                                                                  │
+│  ┌─────────────┐  ┌──────────────┐  ┌──────────────────┐       │
+│  │ API Routes  │  │  Services    │  │  Prompt Engine   │       │
+│  │ /sessions   │  │ game_engine  │  │ Jinja2 Templates │       │
+│  │ /books      │  │ scene_gen    │  │ scene.md         │       │
+│  │ /npc-chat   │  │ novel_analyze│  │ scene_action.md  │       │
+│  │ /auth       │  │ ending_gen   │  │ npc_chat.md      │       │
+│  └─────────────┘  └──────────────┘  └──────────────────┘       │
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────┐       │
+│  │                   LLM Clients                         │       │
+│  │  AIPingClient (OpenAI-compatible)                     │       │
+│  │  ├─ LLM:  Qwen3-8B (text generation)                 │       │
+│  │  ├─ Image: Z-Image-Turbo (scene illustration)        │       │
+│  │  └─ TTS:  Kokoro-82M (voice narration)               │       │
+│  └──────────────────────────────────────────────────────┘       │
+└───────────┬───────────────────────┬─────────────────────────────┘
+            │                       │
+            ▼                       ▼
+┌───────────────────┐   ┌──────────────────────┐
+│   SQLite / PG      │   │   Silent Core API     │
+│   (Game State)     │   │   (Cloudflare Tunnel) │
+│                    │   │                       │
+│  • world_state     │   │  /v1/chat/completions │
+│  • game_session    │   │  /v1/images/generate  │
+│  • book            │   │  /v1/audio/speech     │
+│  • users           │   │                       │
+│  • save_slot       │   │  API Key: sc_2d2ed... │
+└───────────────────┘   └──────────────────────┘
+```
+
+### Data Flow: One Game Turn
+
+```
+Player Action
+    │
+    ▼
+Frontend ──POST /sessions/{id}/advance──▶ Backend
+    │                                          │
+    │                                   ┌──────▼──────┐
+    │                                   │ game_engine  │
+    │                                   │ advance()    │
+    │                                   └──────┬──────┘
+    │                                          │
+    │                                   ┌──────▼──────────┐
+    │                                   │ Prompt Builder   │
+    │                                   │ Jinja2 template  │
+    │                                   │ + world_state    │
+    │                                   └──────┬──────────┘
+    │                                          │
+    │                                   ┌──────▼──────┐
+    │                                   │ LLM API Call │──▶ Silent Core API
+    │                                   │ (SSE Stream) │◀── text chunks
+    │                                   └──────┬──────┘
+    │                                          │
+    │                                   ┌──────▼──────┐
+    │                                   │ VN Mode?     │
+    │                                   │ high-arousal │──▶ Image API ──▶ Image URL
+    │                                   │ scene?       │──▶ TTS API   ──▶ Audio
+    │                                   └──────┬──────┘
+    │                                          │
+    │◀──── SSE: scene_chunk + actions ─────────┘
+    │
+    ▼
+Render Scene + Action Buttons
+```
+
+## Project Structure
+
+```
+submission/
+├── presentation/
+│   ├── Hello_E_World_FINAL_v3.mp4          # 3-5 min demo video
+│   ├── Hello_E_World_Pitch_Deck.pptx       # Pitch deck (8 slides)
+│   └── RADEON_INFERENCE_OPTIMIZATION_REPORT.md
+├── model-service/                          # Teammate: GPU model serving
+│   ├── gateway.py                          # OpenAI-compatible API gateway
+│   ├── image_service.py                    # Z-Image-Turbo service
+│   ├── tts_service.py                      # Kokoro-82M TTS service
+│   ├── scripts/                            # Launch & benchmark scripts
+│   └── examples/                           # API usage examples
+├── docs/
+│   ├── PRODUCT.md                          # Product overview
+│   ├── VISION.md                           # Project vision
+│   ├── DEMO_SCRIPT.md                      # Demo recording script
+│   └── VIDEO_SCRIPT.md                     # Video narration script
+├── README.md                               # This file
+├── PROJECT_SPECIFICATION.md                # Full project spec
+├── MODEL_API.md                            # API integration contract
+├── PERFORMANCE_RESULTS.md                  # A/B test data & methodology
+└── RADEON_INFERENCE_OPTIMIZATION_REPORT.md # GPU optimization details
+
+Core application repository: https://github.com/west-liu/HelloEWorld
+```
+
+## Quick Start
+
+### Prerequisites
+
+- Python 3.10+
+- Node.js 18+
+- AMD Radeon GPU with ROCm (for model serving)
+- OpenAI-compatible API endpoint
+
+### Backend
+
+```bash
+git clone https://github.com/west-liu/HelloEWorld.git
+cd HelloEWorld/backend/text_world_backend-main
+pip install -r requirements.txt
+cp .env.example .env   # Edit with your API keys
+python main.py          # Starts on http://localhost:8080
+```
+
+### Frontend
+
+```bash
+cd HelloEWorld/frontend/text_world_frontend-main
+npm install
+npm run dev             # Starts on http://localhost:5173
+```
+
+### Model Service (GPU Server)
+
+```bash
+cd model-service/
+python gateway.py       # Starts OpenAI-compatible API on :8000
+```
+
+### Key Environment Variables
+
+| Variable | Description |
+|---|---|
+| `LLM_API_KEY` | API key for text generation |
+| `LLM_BASE_URL` | Base URL of LLM API endpoint |
+| `LLM_MODEL` | Model ID (default: `silent-core/llm`) |
+| `IMAGE_API_KEY` | API key for image generation |
+| `IMAGE_MODEL` | Image model ID (default: `silent-core/image`) |
+| `TTS_API_KEY` | API key for TTS |
+| `DATABASE_URL` | DB connection string (`sqlite+aiosqlite:///./text_world.db`) |
+
 ## Core capabilities
 
 - **Multi-step planning:** the game engine coordinates retrieval, scene and
