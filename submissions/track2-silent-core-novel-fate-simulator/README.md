@@ -18,7 +18,7 @@
 | 📊 **Pitch Deck (PPTX)** | [Hello_E_World_Pitch_Deck.pptx](presentation/Hello_E_World_Pitch_Deck.pptx) |
 
 | 🔬 **GPU Inference Report** | [RADEON_INFERENCE_OPTIMIZATION_REPORT.md](presentation/RADEON_INFERENCE_OPTIMIZATION_REPORT.md) |
-| 📈 **Model Tuning Evidence** | [model_tuning_evidence.png](presentation/model_tuning_evidence.png) (Radeon GPU screenshot) |
+
 | 📋 **Performance Results** | [PERFORMANCE_RESULTS.md](PERFORMANCE_RESULTS.md) |
 | 🔧 **Model API Spec** | [MODEL_API.md](MODEL_API.md) |
 | 📖 **Project Specification** | [PROJECT_SPECIFICATION.md](PROJECT_SPECIFICATION.md) |
