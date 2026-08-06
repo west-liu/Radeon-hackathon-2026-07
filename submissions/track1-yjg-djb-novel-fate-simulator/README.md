@@ -2,7 +2,7 @@
 
 **Track:** Track 1 - Development of Multimodal Content Creation Tools  
 **Team:** Silent Core  
-**Member:** Asher  
+**Member:** asher  
 **Submission status:** Draft - required deliverables are still being completed.
 
 ## Project Overview
