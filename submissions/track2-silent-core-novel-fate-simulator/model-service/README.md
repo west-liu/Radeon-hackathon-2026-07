@@ -59,7 +59,7 @@ sudo apt-get install -y espeak-ng libsndfile1 ffmpeg cmake git curl
 ```bash
 python3 -m venv /opt/venv && source /opt/venv/bin/activate
 pip install diffusers accelerate kokoro spacy soundfile httpx huggingface_hub
-pip install https://hf-mirror.com/spacy/en_core_web_sm/resolve/main/en_core_web_sm-any-py3-none-any.whl
+pip install https://huggingface.co/spacy/en_core_web_sm/resolve/main/en_core_web_sm-any-py3-none-any.whl
 ```
 
 ### 3. Build llama.cpp with HIP
