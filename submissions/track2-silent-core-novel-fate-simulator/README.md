@@ -16,7 +16,7 @@
 |---|---|
 | 🎬 **3-5 min Demo Video** | [Hello_E_World_FINAL_v3.mp4](presentation/Hello_E_World_FINAL_v3.mp4) |
 | 📊 **Pitch Deck (PPTX)** | [Hello_E_World_Pitch_Deck.pptx](presentation/Hello_E_World_Pitch_Deck.pptx) |
-| 🌐 **HTML Slides** | [slides.html](presentation/slides.html) (open in browser, F for fullscreen, V for voice) |
+
 | 🔬 **GPU Inference Report** | [RADEON_INFERENCE_OPTIMIZATION_REPORT.md](presentation/RADEON_INFERENCE_OPTIMIZATION_REPORT.md) |
 | 📈 **Model Tuning Evidence** | [model_tuning_evidence.png](presentation/model_tuning_evidence.png) (Radeon GPU screenshot) |
 | 📋 **Performance Results** | [PERFORMANCE_RESULTS.md](PERFORMANCE_RESULTS.md) |
