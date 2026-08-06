@@ -1,5 +1,5 @@
 """
-Parallex — vLLM Client
+Hello E World — vLLM Client
 Calls local vLLM server running Qwen2.5-14B-Instruct on W7900.
 """
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Parallex — Parallel Universe Simulator · Track 2</title>
+<title>Hello E World — Parallel Universe Simulator · Track 2</title>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
 <style>
 :root {
@@ -174,10 +174,10 @@ code { font-family: var(--mono); color: var(--accent2); background: var(--bg-car
 
 <!-- Slide 1: Cover -->
 <div class="slide slide-cover active" data-title="Cover">
-  <img src="../poster/parallex_main_poster.png" class="fullscreen-img" alt="">
+  <img src="../poster/helloeworld_main_poster.png" class="fullscreen-img" alt="">
   <div class="slide-overlay">
     <div class="track-badge">TRACK 2 · Private AI Agent Development</div>
-    <h1>Parallex</h1>
+    <h1>Hello E World</h1>
     <div class="subtitle">Parallel Universe Simulator</div>
     <div class="gpu-badge">
       <span class="gpu-dot"></span>
@@ -332,9 +332,9 @@ code { font-family: var(--mono); color: var(--accent2); background: var(--bg-car
 <div class="slide" data-title="Competition">
   <div class="slide-content">
     <div class="slide-title">Competition</div>
-    <h2>Parallex vs. The Field</h2>
+    <h2>Hello E World vs. The Field</h2>
     <table class="tbl">
-      <thead><tr><th>Capability</th><th>Parallex</th><th>ChatGPT</th><th>MBTI/Big5</th><th>Therapy Apps</th><th>Track 2 Avg</th></tr></thead>
+      <thead><tr><th>Capability</th><th>Hello E World</th><th>ChatGPT</th><th>MBTI/Big5</th><th>Therapy Apps</th><th>Track 2 Avg</th></tr></thead>
       <tbody>
         <tr class="highlight"><td>Personality model from conversation</td><td class="own">16-dim</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td></tr>
         <tr class="highlight"><td>Parallel life path simulation</td><td class="own">3 paths</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td></tr>
@@ -349,7 +349,7 @@ code { font-family: var(--mono); color: var(--accent2); background: var(--bg-car
       </tbody>
     </table>
     <div class="callout blue">
-      <strong>Differentiation:</strong> Parallex is the only project that builds a personality model from conversation and uses it to simulate parallel life paths. In Track 2's 56 submissions: 8+ code reviewers, 5+ contract analyzers, 6+ HR/screening, 7+ medical/education. <strong>Zero personality-driven what-if simulators.</strong>
+      <strong>Differentiation:</strong> Hello E World is the only project that builds a personality model from conversation and uses it to simulate parallel life paths. In Track 2's 56 submissions: 8+ code reviewers, 5+ contract analyzers, 6+ HR/screening, 7+ medical/education. <strong>Zero personality-driven what-if simulators.</strong>
     </div>
   </div>
 </div>
@@ -584,8 +584,8 @@ vllm serve Qwen/Qwen2.5-14B-Instruct \
   --max-model-len 8192 \
   --gpu-memory-utilization 0.90
 
-<span class="comment"># Step 5: Start Parallex API</span>
-cd parallex/source
+<span class="comment"># Step 5: Start Hello E World API</span>
+cd helloeworld/source
 pip install -r requirements.txt
 VLLM_BASE=http://127.0.0.1:8000/v1 \
   uvicorn main:app --host 0.0.0.0 --port 8080
@@ -738,7 +738,7 @@ POST /v1/chat/completions
     <div class="slide-title">Track 2 Compliance</div>
     <h2>Scoring Criteria Checklist</h2>
     <table class="tbl">
-      <thead><tr><th>Criterion</th><th>Requirement</th><th>Parallex</th><th>Evidence</th></tr></thead>
+      <thead><tr><th>Criterion</th><th>Requirement</th><th>Hello E World</th><th>Evidence</th></tr></thead>
       <tbody>
         <tr class="highlight"><td>Local Deployment</td><td>Full GPU inference, no API</td><td class="yes">Yes</td><td>vLLM + Qwen2.5-14B on W7900</td></tr>
         <tr class="highlight"><td>Agent Properties</td><td>Memory / Planning / Tool Calling</td><td class="yes">All 3</td><td>Q&amp;A history · 3-path planning · extraction/sim APIs</td></tr>
@@ -762,7 +762,7 @@ POST /v1/chat/completions
     <h2>Anticipating Judge Questions</h2>
     <div class="qa-item">
       <div class="q">Q: How is this different from just asking ChatGPT "what if I...?"</div>
-      <div class="a">ChatGPT doesn't know <em>you</em>. It gives generic advice based on your prompt. Parallex builds a 16-dimension personality model from your conversation — your risk tolerance, decision style, cognitive biases — then uses <em>that model</em> to simulate paths that are true to who you are. Same scenario, different person → different paths.</div>
+      <div class="a">ChatGPT doesn't know <em>you</em>. It gives generic advice based on your prompt. Hello E World builds a 16-dimension personality model from your conversation — your risk tolerance, decision style, cognitive biases — then uses <em>that model</em> to simulate paths that are true to who you are. Same scenario, different person → different paths.</div>
     </div>
     <div class="qa-item">
       <div class="q">Q: Is the personality model scientifically validated?</div>
@@ -787,9 +787,9 @@ POST /v1/chat/completions
 <div class="slide" data-title="Summary">
   <div class="slide-content">
     <div class="slide-title">Summary</div>
-    <h2>Why Parallex · Track 2</h2>
+    <h2>Why Hello E World · Track 2</h2>
     <div class="callout radeon">
-      <strong>For Track 2 (Development &amp; Local Deployment of Private AI Agents), Parallex delivers:</strong><br><br>
+      <strong>For Track 2 (Development &amp; Local Deployment of Private AI Agents), Hello E World delivers:</strong><br><br>
       ✓ A <em>personality-driven what-if simulation engine</em> — not a chatbot, not a code reviewer<br>
       ✓ Native <em>AMD Radeon Pro W7900</em> local inference via vLLM + ROCm 7.2.1<br>
       ✓ <em>16-dimension</em> personality model extracted from conversation — adaptive, not a form<br>
@@ -810,9 +810,9 @@ POST /v1/chat/completions
 
 <!-- Slide 20: Closing -->
 <div class="slide slide-cover" data-title="Closing">
-  <img src="../poster/parallex_concept_crossroads.png" class="fullscreen-img" alt="">
+  <img src="../poster/helloeworld_concept_crossroads.png" class="fullscreen-img" alt="">
   <div class="slide-overlay">
-    <h1 style="font-size: 4rem;">Parallex</h1>
+    <h1 style="font-size: 4rem;">Hello E World</h1>
     <p style="font-size: 1.6rem; margin-top: 0.5rem; color: var(--accent);">See every version of yourself.</p>
     <div style="margin-top: 2.5rem; display: flex; flex-direction: column; gap: 0.4rem; color: var(--text-dim); font-size: 0.85rem;">
       <p>Track 2 — Private AI Agent — Local Deployment</p>

@@ -1,5 +1,5 @@
 """
-Parallex — Core Agent
+Hello E World — Core Agent
 Onboarding Interview → Personality Extraction → What-If Simulation
 """
 

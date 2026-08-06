@@ -1,5 +1,5 @@
 """
-Parallex — FastAPI Server
+Hello E World — FastAPI Server
 Onboarding → Personality Extraction → What-If Simulation
 All inference on local AMD Radeon GPU via vLLM.
 """
@@ -31,13 +31,13 @@ profile: PersonalityProfile | None = None
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("\n" + "=" * 60)
-    print("🔮 Parallex — Parallel Universe Simulator")
+    print("🔮 Hello E World — Parallel Universe Simulator")
     print(f"   vLLM: {VLLM_BASE}")
     print("   GPU:  AMD Radeon Pro W7900 (48GB)")
     print("=" * 60 + "\n")
     yield
 
-app = FastAPI(title="Parallex", version="0.1.0", lifespan=lifespan)
+app = FastAPI(title="Hello E World", version="0.1.0", lifespan=lifespan)
 
 
 # ─── Models ──────────────────────────────────────────────────────
@@ -59,7 +59,7 @@ async def index():
     frontend = Path(__file__).parent.parent / "frontend" / "index.html"
     if frontend.exists():
         return frontend.read_text(encoding="utf-8")
-    return HTMLResponse("<h1>Parallex</h1><p>Frontend not found.</p>")
+    return HTMLResponse("<h1>Hello E World</h1><p>Frontend not found.</p>")
 
 
 # ─── Health ──────────────────────────────────────────────────────

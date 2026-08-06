@@ -1,12 +1,12 @@
 #!/bin/bash
-# parallex/start.sh — One-command startup for Parallex
+# helloeworld/start.sh — One-command startup for Hello E World
 # Adapted from dumate's tomorrow_start.sh
 #
 # Usage: bash start.sh
 # After:  http://localhost:8080
 
 set -e
-LOG="/workspace/persistent/parallex_start.log"
+LOG="/workspace/persistent/helloeworld_start.log"
 > "$LOG"
 
 log() {
@@ -15,10 +15,10 @@ log() {
 
 VENV_PYTHON="/workspace/persistent/venv/bin/python"
 VENV_PIP="/workspace/persistent/venv/bin/pip"
-CODE_DIR="/workspace/persistent/parallex/source"
+CODE_DIR="/workspace/persistent/helloeworld/source"
 MODEL_DIR="/workspace/persistent/models"
 
-log "=== Parallex Startup ==="
+log "=== Hello E World Startup ==="
 
 # 1. Verify GPU
 log "Step 1: Verifying GPU..."
@@ -45,7 +45,7 @@ fi
 log "Model OK"
 
 # 3. Install deps
-log "Step 3: Installing Parallex dependencies..."
+log "Step 3: Installing Hello E World dependencies..."
 cd "$CODE_DIR"
 $VENV_PIP install -r requirements.txt >> "$LOG" 2>&1
 log "Deps OK"
@@ -82,8 +82,8 @@ else
     log "WARNING: vLLM may not be ready. Check /workspace/persistent/vllm_server.log"
 fi
 
-# 6. Start Parallex API
-log "Step 6: Starting Parallex API..."
+# 6. Start Hello E World API
+log "Step 6: Starting Hello E World API..."
 # Kill old instance if any
 pkill -f "uvicorn main:app" 2>/dev/null || true
 sleep 1
@@ -91,28 +91,28 @@ sleep 1
 cd "$CODE_DIR"
 VLLM_BASE="http://127.0.0.1:8000/v1" \
 nohup $VENV_PYTHON -m uvicorn main:app --host 0.0.0.0 --port 8080 \
-    > /workspace/persistent/parallex_api.log 2>&1 &
-log "Parallex API starting..."
+    > /workspace/persistent/helloeworld_api.log 2>&1 &
+log "Hello E World API starting..."
 
 # 7. Verify
-log "Step 7: Verifying Parallex API..."
+log "Step 7: Verifying Hello E World API..."
 sleep 3
 HEALTH=$(curl -s http://localhost:8080/health 2>/dev/null)
 if [ -n "$HEALTH" ]; then
-    log "Parallex API OK: $HEALTH"
+    log "Hello E World API OK: $HEALTH"
 else
-    log "WARNING: API not responding. Check /workspace/persistent/parallex_api.log"
+    log "WARNING: API not responding. Check /workspace/persistent/helloeworld_api.log"
 fi
 
 # 8. Summary
-log "=== Parallex READY ==="
+log "=== Hello E World READY ==="
 cat <<'SUMMARY'
 
 ╔══════════════════════════════════════════════════════════════╗
-║              🔮 Parallex — Ready                              ║
+║              🔮 Hello E World — Ready                              ║
 ╠══════════════════════════════════════════════════════════════╣
 ║  vLLM Server:     http://localhost:8000                      ║
-║  Parallex API:    http://localhost:8080                      ║
+║  Hello E World API:    http://localhost:8080                      ║
 ║  Frontend:        http://localhost:8080                      ║
 ║                                                              ║
 ║  Quick test:                                                 ║
@@ -121,8 +121,8 @@ cat <<'SUMMARY'
 ║                                                              ║
 ║  Logs:                                                       ║
 ║  tail -f /workspace/persistent/vllm_server.log               ║
-║  tail -f /workspace/persistent/parallex_api.log              ║
-║  tail -f /workspace/persistent/parallex_start.log             ║
+║  tail -f /workspace/persistent/helloeworld_api.log              ║
+║  tail -f /workspace/persistent/helloeworld_start.log             ║
 ╚══════════════════════════════════════════════════════════════╝
 
 SUMMARY

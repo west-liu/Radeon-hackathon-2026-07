@@ -1,5 +1,5 @@
 """
-Parallex — Data Structures
+Hello E World — Data Structures
 Personality Profile, What-If Scenario, Parallel Path
 """
 
@@ -112,7 +112,7 @@ class WhatIfReport:
 
     def format_markdown(self) -> str:
         lines = [
-            f"# 🔮 Parallex — What-If Report",
+            f"# 🔮 Hello E World — What-If Report",
             f"",
             f"**Scenario:** {self.scenario}",
             f"",
@@ -158,7 +158,7 @@ class WhatIfReport:
         lines.append(f"> {self.closing_insight}")
         lines.append(f"")
         lines.append(f"---")
-        lines.append(f"*Parallex — See every version of yourself. Powered by AMD Radeon GPU + ROCm.*")
+        lines.append(f"*Hello E World — See every version of yourself. Powered by AMD Radeon GPU + ROCm.*")
 
         return "\n".join(lines)
 

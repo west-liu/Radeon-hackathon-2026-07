@@ -1,8 +1,8 @@
-# Parallex — Parallel Universe Simulator
+# Hello E World — Parallel Universe Simulator
 
 > **5 minutes of conversation. Your personality model. Three parallel lives for every decision.**
 
-Parallex is a private, local-first AI agent that builds your personality profile through natural conversation, then simulates what your life would look like if you made different choices — all running on an AMD Radeon GPU.
+Hello E World is a private, local-first AI agent that builds your personality profile through natural conversation, then simulates what your life would look like if you made different choices — all running on an AMD Radeon GPU.
 
 **Track 2**: Development & Local Deployment of Private AI Agents
 **Team**: west-liu
@@ -16,7 +16,7 @@ Parallex is a private, local-first AI agent that builds your personality profile
 
 2. **Understand** — Extracts a 16-dimension personality profile: risk tolerance, decision style, values, strengths, blind spots, cognitive biases.
 
-3. **Simulate** — Input any "what-if" question. Parallex simulates three parallel paths:
+3. **Simulate** — Input any "what-if" question. Hello E World simulates three parallel paths:
    - **Path A (Most Likely)**: Given who you are, what probably happens
    - **Path B (Optimal)**: If luck breaks your way and you play to your strengths
    - **Path C (Shadow)**: If your blind spots and weaknesses dominate
@@ -34,8 +34,8 @@ vllm serve Qwen/Qwen2.5-14B-Instruct \
   --max-model-len 8192 \
   --gpu-memory-utilization 0.90
 
-# 2. Start Parallex API
-cd parallex/source
+# 2. Start Hello E World API
+cd helloeworld/source
 pip install -r requirements.txt
 VLLM_BASE=http://127.0.0.1:8000/v1 uvicorn main:app --host 0.0.0.0 --port 8080
 

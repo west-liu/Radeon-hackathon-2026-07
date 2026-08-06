@@ -1,4 +1,4 @@
-# Parallex — Demo Video Script (3:30)
+# Hello E World — Demo Video Script (3:30)
 
 **Format**: Word-for-word English narration + on-screen actions
 **Use**: Read aloud for voiceover, or use as subtitles directly
@@ -16,7 +16,7 @@
 
 > "What if you could see every version of yourself?"
 
-**Fade to**: Browser window. Parallex UI loads — dark theme, purple accent, sidebar with "AMD Radeon W7900 · vLLM" badge pulsing green.
+**Fade to**: Browser window. Hello E World UI loads — dark theme, purple accent, sidebar with "AMD Radeon W7900 · vLLM" badge pulsing green.
 
 **Narration**:
 
@@ -41,7 +41,7 @@ Click the **"⚡ Demo"** button in the sidebar. 6 Q&A pairs appear instantly —
 
 **Narration**:
 
-> This is Parallex. No forms, no questionnaires.
+> This is Hello E World. No forms, no questionnaires.
 > It talks to you — one question at a time — and follows up on what you say.
 > In five minutes, it understands how you think.
 > Click Demo to preload a sample conversation and skip ahead.
@@ -116,7 +116,7 @@ rocm-smi
 
 Show GPU output: AMD Radeon Pro W7900, 48GB VRAM, utilization spiking during inference.
 
-Switch back to the Parallex UI.
+Switch back to the Hello E World UI.
 
 **Narration**:
 
@@ -126,7 +126,7 @@ Switch back to the Parallex UI.
 
 **End screen** (black, centered text):
 
-> **Parallex**
+> **Hello E World**
 > See every version of yourself.
 >
 > Track 2 — Private AI Agent — Local Deployment
@@ -134,14 +134,14 @@ Switch back to the Parallex UI.
 
 **Narration**:
 
-> Parallex. See every version of yourself.
+> Hello E World. See every version of yourself.
 
 ---
 
 ## Recording Checklist
 
 **Before recording**:
-- [ ] Clear browser cache, load Parallex fresh
+- [ ] Clear browser cache, load Hello E World fresh
 - [ ] Open terminal, ready to run `rocm-smi`
 - [ ] OBS Studio configured: 1920x1080, 30fps
 

@@ -1,4 +1,4 @@
-# Parallex — AI 人生规划师
+# Hello E World — AI 人生规划师
 
 > **核心定位**：不是算命，不是 chatbot。是基于你真实人格的**人生推演引擎**。
 
@@ -54,11 +54,11 @@
 
 ---
 
-## 3. 为什么 Parallex 不是"又一个 AI 套壳"
+## 3. 为什么 Hello E World 不是"又一个 AI 套壳"
 
 ### 核心壁垒
 1. **人格模型是数据飞轮** — 用的人越多，人格推演越准
-2. **不是问答，是推演** — ChatGPT 只能给你建议，Parallex 给你路径
+2. **不是问答，是推演** — ChatGPT 只能给你建议，Hello E World 给你路径
 3. **心理学底层** — 不是随意生成，是基于决策心理学+认知偏差的严谨建模
 4. **隐私 = 信任** — 全本地推理，人格数据不出设备
 
@@ -69,13 +69,13 @@
 | 心理咨询 App | 情绪支持 | 不给具体路径推演 |
 | 职业规划师 | 1v1 咨询 | 贵（~500/h），无法规模化 |
 | 算命/占星 | 模糊预测 | 不基于数据 |
-| **Parallex** | 人格驱动的路径推演 | **唯一** |
+| **Hello E World** | 人格驱动的路径推演 | **唯一** |
 
 ---
 
 ## 4. Track 2 评分对齐
 
-| 评分维度 | Parallex 怎么做 |
+| 评分维度 | Hello E World 怎么做 |
 |----------|----------------|
 | **本地部署** | 100% vLLM + W7900，人格数据本机存储 |
 | **Agent 属性** | 持续对话记忆 → 人格模型 → 多路径规划 → 结果解释 |
@@ -102,7 +102,7 @@
 
 ## 6. Demo 话术（视频用）
 
-> "Everyone tells you to 'follow your passion' or 'make a 5-year plan.' But nobody can show you what those plans actually look like — because they don't know you. Parallex does."
+> "Everyone tells you to 'follow your passion' or 'make a 5-year plan.' But nobody can show you what those plans actually look like — because they don't know you. Hello E World does."
 
 > "5 minutes of conversation. Your personality model. Your 3-year plan in 3 parallel universes. Running entirely on this AMD Radeon GPU. Your data never leaves this machine."
 
@@ -112,7 +112,7 @@
 
 ```
          ┌──────────────────────────┐
-         │   Parallex Platform      │
+         │   Hello E World Platform      │
          ├──────────────────────────┤
          │ 🔮 Life Path Simulator   │ ← 3/5 年推演
          │ 🧠 Personality Model     │ ← 核心壁垒

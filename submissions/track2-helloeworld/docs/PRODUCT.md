@@ -1,4 +1,4 @@
-# Parallex — 平行宇宙模拟器
+# Hello E World — 平行宇宙模拟器
 
 > **一句话**：和 AI 聊 5 分钟天，它会比你自己更了解你——然后用你的"人格模型"推演任何选择的三种平行人生。
 
@@ -8,7 +8,7 @@
 
 ## 1. 这是什么
 
-Parallex 是一个**人格驱动的 What-If 引擎**。
+Hello E World 是一个**人格驱动的 What-If 引擎**。
 
 它不是问答机器人，不是心理咨询，不是算命。它是一个**推理工具**——用对话理解你是谁，然后用你的真实人格推演不同选择带来的不同结果。
 
@@ -21,9 +21,9 @@ Parallex 是一个**人格驱动的 What-If 引擎**。
 
 ## 2. 为什么这个能赢
 
-### Track 2 评分标准 vs Parallex
+### Track 2 评分标准 vs Hello E World
 
-| 标准 | 说明 | Parallex 怎么做 |
+| 标准 | 说明 | Hello E World 怎么做 |
 |------|------|----------------|
 | **本地部署** | 全程 GPU 推理，不依赖 API | vLLM + Qwen2.5-14B 纯本地 W7900 推理 |
 | **Agent 属性** | 记忆/规划/工具调用 | 渐进式人格建模、三路径推演规划、对话记忆链 |
@@ -41,7 +41,7 @@ Track 2 共 57 个项目，分析后：
 - 地震/灾害模拟：2+ 个
 - **What-If / 平行宇宙 / 人生模拟：0 个**
 
-Parallex 是 Track 2 里**唯一**做人格驱动模拟的项目。这就是差异化。
+Hello E World 是 Track 2 里**唯一**做人格驱动模拟的项目。这就是差异化。
 
 ---
 
@@ -54,7 +54,7 @@ Parallex 是 Track 2 里**唯一**做人格驱动模拟的项目。这就是差�
 └─────────────────┬───────────────────────────────┘
                   │ HTTP/SSE
 ┌─────────────────▼───────────────────────────────┐
-│  FastAPI Server (parallex/source/main.py)        │
+│  FastAPI Server (helloeworld/source/main.py)        │
 │  - 会话管理（内存，MVP）                          │
 │  - 对话路由、人格提取、场景推演                   │
 └─────────────────┬───────────────────────────────┘
@@ -83,7 +83,7 @@ Parallex 是 Track 2 里**唯一**做人格驱动模拟的项目。这就是差�
 ## 4. 文件结构
 
 ```
-parallex/
+helloeworld/
 ├── PRODUCT.md              ← 你正在看的这个
 ├── frontend/
 │   └── index.html          ← 聊天 UI（单文件，零依赖）
@@ -142,7 +142,7 @@ parallex/
 ## 6. Demo 演示流程（视频用，3-5 分钟）
 
 ### 开场（30 秒）
-> "I'm going to show you Parallex — a parallel universe simulator that builds your personality model in 5 minutes, then shows you three versions of yourself for any life decision."
+> "I'm going to show you Hello E World — a parallel universe simulator that builds your personality model in 5 minutes, then shows you three versions of yourself for any life decision."
 
 ### Step 1: 对话（60 秒）
 - 点击 Demo 按钮，预载 6 组对话
@@ -162,7 +162,7 @@ parallex/
 - 展示 Bias Analysis + Closing Insight
 
 ### 结尾（30 秒）
-> "Parallex runs entirely on AMD Radeon Pro W7900 with vLLM. No API calls, no data leaves this machine. Your personality stays yours. Thank you."
+> "Hello E World runs entirely on AMD Radeon Pro W7900 with vLLM. No API calls, no data leaves this machine. Your personality stays yours. Thank you."
 
 ---
 
@@ -180,7 +180,7 @@ parallex/
 [ ] 安装 vLLM (pip install vllm)
 [ ] 下载 Qwen2.5-14B-Instruct
 [ ] 启动 vLLM 服务
-[ ] 部署 Parallex 代码
+[ ] 部署 Hello E World 代码
 [ ] pip install -r requirements.txt
 [ ] 启动 FastAPI (uvicorn main:app --host 0.0.0.0 --port 8080)
 [ ] 测试 GET /health
@@ -201,18 +201,18 @@ vllm serve Qwen/Qwen2.5-14B-Instruct \
 
 ### FastAPI 启动命令
 ```bash
-cd /workspace/persistent/parallex/source
+cd /workspace/persistent/helloeworld/source
 VLLM_BASE=http://127.0.0.1:8000/v1 uvicorn main:app --host 0.0.0.0 --port 8080
 ```
 
 ---
 
-## 8. 为什么叫 Parallex
+## 8. 为什么叫 Hello E World
 
-**Parallax** (视差) + **Parallel** (平行) = **Parallex**
+**Parallax** (视差) + **Parallel** (平行) = **Hello E World**
 
 视差效应：从不同角度观察同一物体，看到不同的图像。
-Parallex 让你从不同平行宇宙的角度观察同一个自己。
+Hello E World 让你从不同平行宇宙的角度观察同一个自己。
 
 ---
 
@@ -230,4 +230,4 @@ Parallex 让你从不同平行宇宙的角度观察同一个自己。
 | README (英文) | ❌ 待写 |
 | Demo 视频 | ❌ 待录 |
 
-**下一步**：解决 SSH → 部署 vLLM + 模型 → 部署 Parallex → 测试 → 录视频
+**下一步**：解决 SSH → 部署 vLLM + 模型 → 部署 Hello E World → 测试 → 录视频

@@ -1,4 +1,4 @@
-# Parallex — Project Specification
+# Hello E World — Project Specification
 
 **Track 2**: Development & Local Deployment of Private AI Agents
 **Team**: west-liu
@@ -9,7 +9,7 @@
 ## 1. Application Scenarios
 
 ### Primary: Personal Decision Support
-A user facing a major life decision (career change, relocation, relationship, education) talks to Parallex for 5 minutes. Parallex builds a personality model and simulates three parallel life paths for their scenario.
+A user facing a major life decision (career change, relocation, relationship, education) talks to Hello E World for 5 minutes. Hello E World builds a personality model and simulates three parallel life paths for their scenario.
 
 ### Secondary: Long-term Life Planning
 Beyond single decisions — users can model 3-year and 5-year trajectories based on different career, financial, and lifestyle choices. Personality-aware planning, not generic advice.
@@ -175,13 +175,13 @@ If vLLM on W7900 encounters compatibility issues:
 
 ## 7. Evaluation Criteria Alignment
 
-| Official Criterion | Parallex Implementation |
+| Official Criterion | Hello E World Implementation |
 |--------------------|------------------------|
 | Application scenarios | Personal decisions, life planning, team matching |
 | Agent architecture diagram | See Section 2 |
 | Core capabilities | Conversational onboarding, personality extraction, what-if simulation |
 | Model & local deployment | Qwen2.5-14B on W7900 via vLLM, full deployment guide |
 | Inference optimization | ROCm-specific PyTorch, triton-rocm, HIP graphs, memory tuning |
-| Source code | Complete at `parallex/source/` with README |
+| Source code | Complete at `helloeworld/source/` with README |
 | Demo video | 3:30 scripted demonstration with GPU evidence |
 | Supplementary | PPT/Poster |

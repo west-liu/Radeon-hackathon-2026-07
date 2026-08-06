@@ -1,4 +1,4 @@
-# Parallex Demo Video Script (3:30)
+# Hello E World Demo Video Script (3:30)
 
 **Narrator**: Calm, thoughtful. Not salesy.
 
@@ -15,7 +15,7 @@ Text changes:
 Text changes:
 > "What if you could see every version of yourself?"
 
-**Fade to**: Browser window opens. Parallex UI loads. Purple accent on dark theme.
+**Fade to**: Browser window opens. Hello E World UI loads. Purple accent on dark theme.
 
 **Narration**:
 "Every decision we make closes some doors and opens others. But we never get to see what was behind the doors we closed. Until now."
@@ -34,7 +34,7 @@ Show the chat flowing:
 - AI: "What are you most afraid of right now?"
 
 **Narration**:
-"No forms. No questionnaires. Parallex talks to you — one question at a time. It follows up on what you say, goes deeper when you're ready. In 5 minutes, it understands how you think."
+"No forms. No questionnaires. Hello E World talks to you — one question at a time. It follows up on what you say, goes deeper when you're ready. In 5 minutes, it understands how you think."
 
 **Click**: "🔮 Extract My Personality"
 
@@ -82,7 +82,7 @@ Click "🔮 Simulate". Show the report rendering:
 > "Closing Insight: You're not deciding between starting at 25 vs 30. You're deciding whether to trust yourself before you feel ready. You will never feel ready."
 
 **Narration**:
-"Parallex doesn't tell you what to do. It shows you who you are — and lets you see the versions of yourself that different choices create. Sometimes the best advice isn't advice. It's a mirror."
+"Hello E World doesn't tell you what to do. It shows you who you are — and lets you see the versions of yourself that different choices create. Sometimes the best advice isn't advice. It's a mirror."
 
 ---
 
@@ -91,11 +91,11 @@ Click "🔮 Simulate". Show the report rendering:
 **Screen**: Show terminal with `rocm-smi` output, then back to UI.
 
 **Narration**:
-"Running entirely on AMD Radeon Pro W7900. vLLM. 45 tokens per second. Your personality data never leaves this machine. Parallex. See every version of yourself."
+"Running entirely on AMD Radeon Pro W7900. vLLM. 45 tokens per second. Your personality data never leaves this machine. Hello E World. See every version of yourself."
 
 **End screen**: 
 ```
-Parallex
+Hello E World
 Track 2 - Private AI Agent - Local Deployment
 github.com/west-liu/Radeon-hackathon-2026-07
 ```
@@ -106,11 +106,11 @@ github.com/west-liu/Radeon-hackathon-2026-07
 
 ### What you need:
 1. Screen recorder (OBS Studio recommended)
-2. Browser open to Parallex UI
+2. Browser open to Hello E World UI
 3. Another terminal window showing `rocm-smi`
 
 ### Steps to record:
-1. Clear browser cache, open Parallex
+1. Clear browser cache, open Hello E World
 2. Start OBS recording
 3. Click Demo, follow the script
 4. For Scene 5: switch to terminal, run `rocm-smi`, show GPU stats
