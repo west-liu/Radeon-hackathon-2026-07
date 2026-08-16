@@ -527,3 +527,49 @@ sleep 2
 
 # Restart in order (see "Run all services in background" above)
 ```
+
+### 15. Image service: model not found `/persistent/silent-core/models/Z-Image-Turbo`
+
+```
+ValueError: The provided pretrained_model_name_or_path "/persistent/silent-core/models/Z-Image-Turbo" is neither a valid local path nor a valid repo id.
+```
+
+**Cause:** `image_service.py` defaults to `/persistent/silent-core/models/Z-Image-Turbo`
+via `IMAGE_MODEL_PATH` env var. This path doesn't exist on fresh AMD Cloud instances.
+The code also uses `local_files_only=True`, so it will NOT auto-download.
+
+**Fix:** Download the model manually and set `IMAGE_MODEL_PATH`:
+```bash
+# Download from correct HuggingFace repo (Tongyi-MAI, NOT ZhipuAI)
+export HF_ENDPOINT=https://hf-mirror.com  # For China users
+huggingface-cli download Tongyi-MAI/Z-Image-Turbo \
+  --local-dir /data/models/Z-Image-Turbo
+
+# Set env vars before starting Image service
+export IMAGE_MODEL_PATH="/data/models/Z-Image-Turbo"
+export GENERATED_IMAGE_DIR="/data/generated/images"
+mkdir -p /data/generated/images
+```
+
+> **Important:** The correct HuggingFace repo is `Tongyi-MAI/Z-Image-Turbo`
+> (Apache 2.0 license). The repo `ZhipuAI/Z-Image-Turbo` does NOT exist
+> and returns 401 Unauthorized.
+
+### 16. Image/TTS service environment variables
+
+The Image and TTS services read several environment variables that must be
+set **before** starting uvicorn:
+
+| Service | Env Var | Default | Purpose |
+|---------|---------|---------|---------|
+| Image | `IMAGE_MODEL_PATH` | `/persistent/silent-core/models/Z-Image-Turbo` | Model location |
+| Image | `GENERATED_IMAGE_DIR` | `/persistent/silent-core/generated/images` | Output directory |
+| Image | `IMAGE_CPU_OFFLOAD` | `true` | CPU offload to save VRAM |
+| Image | `IMAGE_UNLOAD_AFTER_REQUEST` | `false` | Unload model after each request |
+| Image | `IMAGE_COMPILE_TRANSFORMER` | `false` | torch.compile optimization |
+| Gateway | `LLM_URL` | `http://127.0.0.1:8001` | LLM backend URL |
+| Gateway | `IMAGE_URL` | `http://127.0.0.1:8002` | Image backend URL |
+| Gateway | `TTS_URL` | `http://127.0.0.1:8003` | TTS backend URL |
+
+**All defaults use wrong ports (8001/8002/8003).** Always override with
+8081/8082/8083 when starting on AMD Cloud.
