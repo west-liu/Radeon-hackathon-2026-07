@@ -128,7 +128,62 @@ uvicorn tts_service:app --host 0.0.0.0 --port 8083
 export SILENT_CORE_API_KEY="test-key"
 export SILENT_CORE_INTERNAL_API_KEY="test-key"
 export LLM_URL="http://127.0.0.1:8081"
+export IMAGE_URL="http://127.0.0.1:8082"
+export TTS_URL="http://127.0.0.1:8083"
 uvicorn gateway:app --host 0.0.0.0 --port 8000
+```
+
+> **Critical: Set ALL three URL environment variables.** The gateway code
+> defaults to ports 8001/8002/8003, but services run on 8081/8082/8083.
+> If you only set `LLM_URL` and forget `IMAGE_URL` / `TTS_URL`, image and
+> TTS requests will silently return a 70-byte JSON error file instead of
+> the actual image/audio output. See Troubleshooting #9.
+
+#### Run all services in background (one-time setup script)
+
+```bash
+cd /workspace/Radeon-hackathon-2026-07/submissions/track2-silent-core-novel-fate-simulator/model-service
+source /opt/venv/bin/activate
+
+# Kill any old processes first
+pkill -f "llama-server" 2>/dev/null
+pkill -f "uvicorn image_service" 2>/dev/null
+pkill -f "uvicorn tts_service" 2>/dev/null
+pkill -f "uvicorn gateway" 2>/dev/null
+sleep 2
+
+# LLM
+nohup /workspace/llama.cpp/build/bin/llama-server \
+  --model /workspace/models/Qwen3-8B-GGUF/Qwen3-8B-Q4_K_M.gguf \
+  --host 127.0.0.1 --port 8081 \
+  --n-gpu-layers 99 --ctx-size 8192 --threads 16 \
+  --batch-size 512 --flash-attn on \
+  > /tmp/llm.log 2>&1 &
+
+sleep 10  # Wait for model loading
+
+# Image
+nohup uvicorn image_service:app --host 0.0.0.0 --port 8082 > /tmp/image.log 2>&1 &
+sleep 5
+
+# TTS
+nohup uvicorn tts_service:app --host 0.0.0.0 --port 8083 > /tmp/tts.log 2>&1 &
+sleep 3
+
+# Gateway
+export SILENT_CORE_API_KEY="test-key"
+export SILENT_CORE_INTERNAL_API_KEY="test-key"
+export LLM_URL="http://127.0.0.1:8081"
+export IMAGE_URL="http://127.0.0.1:8082"
+export TTS_URL="http://127.0.0.1:8083"
+nohup uvicorn gateway:app --host 0.0.0.0 --port 8000 > /tmp/gateway.log 2>&1 &
+sleep 3
+
+# Verify all services
+for port in 8081 8082 8083 8000; do
+  code=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:$port/docs 2>/dev/null)
+  echo "Port $port: $code"
+done
 ```
 
 ### Smoke test
@@ -157,13 +212,76 @@ curl -H "Authorization: Bearer test-key" -H "Content-Type: application/json" \
 
 | Workload | Metric | Value |
 |---|---|---|
-| LLM decode | tokens/s | ~91.6 |
+| LLM decode | tokens/s | ~93.3 |
+| LLM prompt processing | tokens/s | ~2989 |
 | LLM TTFT | ms | ~42 |
 | Image (warm) | seconds | ~10.8 |
 | TTS | real-time factor | ~0.51 |
 
 Detailed methodology in `PERFORMANCE_RESULTS.md` and
 `RADEON_INFERENCE_OPTIMIZATION_REPORT.md`.
+
+## Model Tuning Guide
+
+The tuning process follows three steps: (1) check GPU status, (2) run
+baseline benchmark, (3) compare different parameters.
+
+### Step 1: Check GPU status
+
+```bash
+rocm-smi --showuse --showmeminfo vram --showpower --showtemp
+```
+
+Key metrics to watch:
+- **GPU Use**: 0% when idle, 80%+ during inference
+- **VRAM**: ~5.75 GB used by LLM (Q4_K_M), ~26 MB when idle
+- **Temperature**: < 70°C normal, 25°C idle
+- **Power**: 15W idle, 200-300W under load
+
+### Step 2: Run baseline benchmark
+
+```bash
+/workspace/llama.cpp/build/bin/llama-bench \
+  -m /workspace/models/Qwen3-8B-GGUF/Qwen3-8B-Q4_K_M.gguf \
+  -ngl 99 -t 16 -fa 1 -p 512 -n 128
+```
+
+- `pp512` = prompt processing speed (tokens/s, higher is better)
+- `tg128` = token generation speed (tokens/s, higher is better)
+
+### Step 3: Compare parameters
+
+Test different configurations and compare:
+
+| Config | GPU Layers | Threads | Flash Attn | pp512 (t/s) | tg128 (t/s) | Notes |
+|---|---:|---:|---|---:|---:|---|
+| **Baseline (best)** | 99 | 16 | on | 2989 | **93.32** | Current production config |
+| Flash Attn off | 99 | 16 | off | 2774 | 87.65 | 6% slower |
+| 8 threads | 99 | 8 | on | 2984 | 92.77 | Minimal difference |
+| Reduced GPU layers | 15 | 16 | on | 395 | 10.03 | **89% slower** — avoid |
+
+**Conclusions:**
+- Flash Attention gives ~6% speedup — always enable (`--flash-attn on`)
+- 8 vs 16 threads: negligible difference on this GPU
+- Reducing GPU layers from 99 to 15 causes catastrophic slowdown — keep all layers on GPU
+- Q4_K_M quantization provides 3.8x throughput vs BF16 baseline while using 1/3 VRAM
+
+### API-level tuning (temperature)
+
+```bash
+# Low temperature (0.3) = stable, precise output
+curl -s -H "Authorization: Bearer test-key" -H "Content-Type: application/json" \
+  http://127.0.0.1:8000/v1/chat/completions \
+  -d '{"model":"silent-core/llm","messages":[{"role":"user","content":"Write a fantasy scene"}],"max_tokens":256,"temperature":0.3}'
+
+# High temperature (1.0) = more creative
+curl -s -H "Authorization: Bearer test-key" -H "Content-Type: application/json" \
+  http://127.0.0.1:8000/v1/chat/completions \
+  -d '{"model":"silent-core/llm","messages":[{"role":"user","content":"Write a fantasy scene"}],"max_tokens":256,"temperature":1.0}'
+```
+
+For narrative generation, `temperature: 0.7-0.9` is recommended for
+balanced creativity and coherence.
 
 ## Client setup
 
@@ -251,17 +369,23 @@ uvicorn gateway:app --host 0.0.0.0 --port 8000
 {"detail": "Model service unavailable: All connection attempts failed"}
 ```
 
-**Cause:** Gateway cannot reach the LLM backend. The `LLM_URL` environment
-variable is not set, so gateway doesn't know where llama-server is listening.
+**Cause:** Gateway cannot reach one or more backend services. The gateway
+code reads three URL environment variables with **wrong default ports**:
 
-**Fix:** Set `LLM_URL` before starting gateway:
-```bash
-export LLM_URL="http://127.0.0.1:8081"
+```python
+LLM_URL = os.getenv("LLM_URL", "http://127.0.0.1:8001")    # default 8001, should be 8081
+IMAGE_URL = os.getenv("IMAGE_URL", "http://127.0.0.1:8002") # default 8002, should be 8082
+TTS_URL = os.getenv("TTS_URL", "http://127.0.0.1:8003")    # default 8003, should be 8083
 ```
 
-Also verify LLM is actually running:
+If any URL is not set, the gateway connects to the wrong port and silently
+fails. The error response is a 70-byte JSON file, NOT the actual image/audio.
+
+**Fix:** Set ALL three URL variables before starting gateway:
 ```bash
-curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8081/health
+export LLM_URL="http://127.0.0.1:8081"
+export IMAGE_URL="http://127.0.0.1:8082"
+export TTS_URL="http://127.0.0.1:8083"
 ```
 
 ### 6. Checking which services are running
@@ -300,3 +424,106 @@ error: argument --flash-attn: expected one argument
 ```
 
 **Fix:** Use `--flash-attn on` (not just `--flash-attn`).
+
+### 9. Image/TTS returns 70-byte JSON instead of real file
+
+```
+-rw-r--r-- 1 root root 70 Aug 16 13:34 /tmp/test_image.png
+/tmp/test_image.png: JSON text data
+```
+
+**Cause:** The gateway's default port mapping (8002/8003) doesn't match the
+actual service ports (8082/8083). The gateway returns an error JSON but the
+curl command saves it as `.png` or `.wav`.
+
+**Diagnosis:**
+```bash
+cat /tmp/test_image.png
+# If it shows: {"detail":"Model service unavailable: All connection attempts failed"}
+# Then IMAGE_URL or TTS_URL is not set correctly.
+```
+
+**Fix:** Set `IMAGE_URL` and `TTS_URL`, then restart gateway (see #5).
+
+### 10. `llama-bench` fails: `failed to load model`
+
+```
+llama_bench: error: failed to load model './models/Qwen3-8B-GGUF/Qwen3-8B-Q4_K_M.gguf'
+```
+
+**Cause:** Using a relative path (`./models/...`) from the `model-service`
+directory. The model files are at `/workspace/models/` (or a symlink to
+`/data/models/`), not inside `model-service/models/`.
+
+**Fix:** Use absolute path:
+```bash
+/workspace/llama.cpp/build/bin/llama-bench \
+  -m /workspace/models/Qwen3-8B-GGUF/Qwen3-8B-Q4_K_M.gguf \
+  -ngl 99 -t 16 -fa 1 -p 512 -n 128
+```
+
+Or create a symlink in the model-service directory:
+```bash
+ln -sf /workspace/models ./models
+```
+
+### 11. Disk space: `No space left on device`
+
+```
+OSError: [Errno 28] No space left on device
+```
+
+**Cause:** The `/workspace` partition has only ~20 GB. Model files (4-5 GB
+each) fill it up quickly.
+
+**Fix:** Store models in `/data/models/` (root partition, ~700 GB available)
+and create a symlink:
+```bash
+mkdir -p /data/models
+mv /workspace/models/* /data/models/
+rm -rf /workspace/models
+ln -s /data/models /workspace/models
+```
+
+### 12. Port already in use: `Errno 98`
+
+```
+ERROR: [Errno 98] error while attempting to bind on address ('0.0.0.0', 8082): address already in use
+```
+
+**Cause:** An old process is still holding the port. `lsof` may not be
+installed in the container.
+
+**Fix:** Use `pkill` (not `lsof`) to kill old processes:
+```bash
+pkill -f "uvicorn image_service" 2>/dev/null
+pkill -f "uvicorn tts_service" 2>/dev/null
+pkill -f "uvicorn gateway" 2>/dev/null
+pkill -f "llama-server" 2>/dev/null
+sleep 2
+
+# Verify ports are free
+ss -tlnp | grep -E '8081|8082|8083|8000'
+```
+
+### 13. HF-MIRROR for users in China
+
+HuggingFace downloads from the default endpoint are extremely slow in China.
+Set `HF_ENDPOINT` **before** running `huggingface-cli`:
+```bash
+export HF_ENDPOINT=https://hf-mirror.com
+huggingface-cli download Qwen/Qwen3-8B-GGUF Qwen3-8B-Q4_K_M.gguf \
+  --local-dir ./models/Qwen3-8B-GGUF
+```
+
+### 14. Restarting all services cleanly
+
+When in doubt, kill everything and restart from scratch:
+```bash
+# Kill all
+pkill -f "llama-server" 2>/dev/null
+pkill -f "uvicorn" 2>/dev/null
+sleep 2
+
+# Restart in order (see "Run all services in background" above)
+```
