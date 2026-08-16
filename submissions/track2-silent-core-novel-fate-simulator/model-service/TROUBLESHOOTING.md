@@ -23,6 +23,10 @@
 | 14 | Restarting all services cleanly | Info |
 | 15 | Image service: model not found (IMAGE_MODEL_PATH) | **Critical** |
 | 16 | Complete environment variables reference | Info |
+| 17 | Image API returns JSON (not raw PNG) | Medium |
+| 18 | TTS service unreachable after restart | **Critical** |
+| 19 | Downloading files from server to local Windows | Info |
+| 20 | Complete startup script for fresh server | Info |
 
 ---
 
@@ -295,3 +299,166 @@ set **before** starting uvicorn:
 
 **All URL defaults use wrong ports (8001/8002/8003).** Always override with
 8081/8082/8083 when starting on AMD Cloud.
+
+## 17. Image API returns JSON (not raw PNG)
+
+```bash
+$ ls -la /workspace/test_image.png
+-rw-r--r-- 1 root root 141 Aug 16 14:04 /workspace/test_image.png
+$ file /workspace/test_image.png
+/workspace/test_image.png: JSON text data
+```
+
+**Cause:** The Image API returns a JSON response with a URL to the generated
+image (OpenAI-compatible format), not the raw image binary:
+
+```json
+{"created":1786889047,"data":[{"url":"http://127.0.0.1:8000/files/images/7080790539dc419d89f01702362f2e17.png","generation_size":"512x512"}]}
+```
+
+**Fix:** Parse the JSON to get the URL, then download the actual image:
+```bash
+# Method 1: Direct file from generated directory
+ls -la /data/generated/images/
+file /data/generated/images/*.png
+
+# Method 2: Download via URL from the JSON response
+url=$(cat /workspace/test_image.png | python3 -c "import sys,json; print(json.load(sys.stdin)['data'][0]['url'])")
+curl -s -o /workspace/real_image.png "$url"
+```
+
+## 18. TTS service unreachable after restart
+
+```
+{"detail":"model service unavailable: All connection attempts failed"}
+```
+
+**Cause:** When restarting Gateway with `pkill -f "uvicorn"`, ALL uvicorn
+processes are killed — including TTS. If TTS is not restarted, or if
+`TTS_URL` env var is not set when Gateway restarts, the same "All connection
+attempts failed" error occurs.
+
+**Fix:** Always restart services in order and set ALL env vars:
+```bash
+# 1. Restart TTS first
+pkill -f "uvicorn tts_service" 2>/dev/null
+sleep 2
+cd /workspace/Radeon-hackathon-2026-07/submissions/track2-silent-core-novel-fate-simulator/model-service
+source /opt/venv/bin/activate
+nohup uvicorn tts_service:app --host 0.0.0.0 --port 8083 > /tmp/tts.log 2>&1 &
+sleep 5
+
+# 2. Restart Gateway with ALL env vars
+pkill -f "uvicorn gateway" 2>/dev/null
+sleep 2
+export SILENT_CORE_API_KEY="test-key"
+export SILENT_CORE_INTERNAL_API_KEY="test-key"
+export LLM_URL="http://127.0.0.1:8081"
+export IMAGE_URL="http://127.0.0.1:8082"
+export TTS_URL="http://127.0.0.1:8083"
+nohup uvicorn gateway:app --host 0.0.0.0 --port 8000 > /tmp/gateway.log 2>&1 &
+sleep 3
+
+# 3. Test TTS
+curl -s -H "Authorization: Bearer test-key" -H "Content-Type: application/json" \
+  http://127.0.0.1:8000/v1/audio/speech \
+  -d '{"model":"silent-core/tts","input":"Hello world"}' \
+  -o /workspace/test_tts.wav
+file /workspace/test_tts.wav  # Should show "WAVE audio" or "data"
+```
+
+## 19. Downloading files from server to local Windows
+
+Use `scp` from Windows CMD (not PowerShell):
+```cmd
+scp -i C:\Users\<username>\.ssh\id_ed25519 -P <PORT> root@<IP>:/data/generated/images/<filename>.png D:\projects\test_image.png
+```
+
+Or copy to `/workspace/` and download via JupyterLab file browser:
+```bash
+cp /data/generated/images/*.png /workspace/
+```
+Then right-click the file in JupyterLab and select "Download".
+
+## 20. Complete startup script for fresh server
+
+Run this script after cloning the repo on a new AMD Cloud instance:
+
+```bash
+#!/bin/bash
+set -e
+
+# === 0. Clone repo ===
+git config --global http.sslVerify false
+git clone https://github.com/west-liu/Radeon-hackathon-2026-07.git
+cd Radeon-hackathon-2026-07/submissions/track2-silent-core-novel-fate-simulator/model-service
+
+# === 1. Install dependencies ===
+python3 -m venv /opt/venv && source /opt/venv/bin/activate
+pip install diffusers accelerate kokoro spacy soundfile httpx huggingface_hub uvicorn
+python -m spacy download en_core_web_sm
+
+# === 2. Build llama.cpp ===
+cd /workspace
+git clone https://github.com/ggml-org/llama.cpp.git
+cd llama.cpp
+cmake -B build -DGGML_HIP=ON -DAMDGPU_TARGETS=gfx1100 -DCMAKE_BUILD_TYPE=Release
+cmake --build build --parallel 8 --target llama-server llama-bench
+cd -
+
+# === 3. Download models ===
+export HF_ENDPOINT=https://hf-mirror.com  # China users
+
+# LLM model
+huggingface-cli download Qwen/Qwen3-8B-GGUF Qwen3-8B-Q4_K_M.gguf \
+  --local-dir /data/models/Qwen3-8B-GGUF
+
+# Image model (Tongyi-MAI, NOT ZhipuAI)
+huggingface-cli download Tongyi-MAI/Z-Image-Turbo \
+  --local-dir /data/models/Z-Image-Turbo
+
+# Create symlink for LLM
+ln -sf /data/models /workspace/models
+
+# Create image output directory
+mkdir -p /data/generated/images
+
+# === 4. Start all services ===
+source /opt/venv/bin/activate
+
+# LLM
+nohup /workspace/llama.cpp/build/bin/llama-server \
+  --model /data/models/Qwen3-8B-GGUF/Qwen3-8B-Q4_K_M.gguf \
+  --host 127.0.0.1 --port 8081 \
+  --n-gpu-layers 99 --ctx-size 8192 --threads 16 \
+  --batch-size 512 --flash-attn on \
+  > /tmp/llm.log 2>&1 &
+sleep 10
+
+# Image
+export IMAGE_MODEL_PATH="/data/models/Z-Image-Turbo"
+export GENERATED_IMAGE_DIR="/data/generated/images"
+nohup uvicorn image_service:app --host 0.0.0.0 --port 8082 > /tmp/image.log 2>&1 &
+sleep 10
+
+# TTS
+nohup uvicorn tts_service:app --host 0.0.0.0 --port 8083 > /tmp/tts.log 2>&1 &
+sleep 5
+
+# Gateway
+export SILENT_CORE_API_KEY="test-key"
+export SILENT_CORE_INTERNAL_API_KEY="test-key"
+export LLM_URL="http://127.0.0.1:8081"
+export IMAGE_URL="http://127.0.0.1:8082"
+export TTS_URL="http://127.0.0.1:8083"
+nohup uvicorn gateway:app --host 0.0.0.0 --port 8000 > /tmp/gateway.log 2>&1 &
+sleep 3
+
+# === 5. Verify all services ===
+echo "LLM: $(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8081/health)"
+echo "Image: $(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8082/docs)"
+echo "TTS: $(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8083/docs)"
+echo "Gateway: $(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8000/docs)"
+```
+
+Save as `setup.sh` and run with `bash setup.sh` on a fresh instance.
